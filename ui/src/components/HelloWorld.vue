@@ -1,118 +1,120 @@
 <template>
-    <div class='hello'>
-    </div>
+    <div></div>
 </template>
 
 <script>
-    import * as d3 from 'd3';
 
-    function getNodeType(labels) {
+    import * as d3 from 'd3'
+
+    function getNodeType (labels) {
         if (labels.find(l => l === 'Tag')) {
-            return 'Tag';
+            return 'Tag'
         } else if (labels.find(l => l === 'Group')) {
-            return 'Group';
+            return 'Group'
         } else if (labels.find(l => l === 'Artist')) {
-            return 'Artist';
+            return 'Artist'
         }
-        return undefined;
+        return undefined
     }
 
-    let data = {};
+    let data = {}
     d3.json('../static/data.json')
         .then((r) => {
-            data = r;
+            data = r
 
             const links = data.map(row => ({
                 source: row._fields[1].start.low,
                 target: row._fields[1].end.low,
-                weight: row._fields[1].properties.weight.low,
-            }));
-            const nodes = [];
-            function addNode(node) {
+                weight: row._fields[1].properties.weight.low
+            }))
+            const nodes = []
+
+            function addNode (node) {
                 if (nodes.find(n => n.id === node.id)) {
-                    return;
+                    return
                 }
-                nodes.push(node);
+                nodes.push(node)
             }
+
             data.forEach((row) => {
                 addNode({
                     id: row._fields[0].identity.low,
                     name: row._fields[0].properties.name,
                     listeners: row._fields[0].properties.listeners.low,
-                    type: getNodeType(row._fields[0].labels),
-                });
+                    type: getNodeType(row._fields[0].labels)
+                })
                 addNode({
                     id: row._fields[2].identity.low,
                     name: row._fields[2].properties.name,
-                    type: 'Tag',
-                });
-            });
+                    type: 'Tag'
+                })
+            })
 
-            function getRadius(node) {
+            function getRadius (node) {
                 if (node.type === 'Tag') {
-                    return 10;
+                    return 10
                 }
-                return Math.max(Math.sqrt(node.listeners / 5000), 15);
+                return Math.max(Math.sqrt(node.listeners / 5000), 15)
             }
 
-            function getColor(node) {
+            function getColor (node) {
                 switch (node.type) {
                 case 'Tag':
-                    return '#e0e0e0';
+                    return '#e0e0e0'
                 case 'Artist':
-                    return '#42c3f7';
+                    return '#42c3f7'
                 case 'Group':
-                    return '#00a5e9';
+                    return '#00a5e9'
                 default:
-                    return '#DEADFB';
+                    return '#DEADFB'
                 }
             }
 
-            const width = window.innerWidth - 5;
-            const height = window.innerHeight - 5;
+            const width = window.innerWidth - 5
+            const height = window.innerHeight - 5
 
             // ??
             const simulation = d3.forceSimulation(nodes)
                 .force('link', d3.forceLink(links).id(d => d.id))
                 .force('charge', d3.forceManyBody())
                 .force('center', d3.forceCenter(width / 2, height / 2))
-            ;
 
-            let container;
-            function zoomed() {
-                container.attr('transform', d3.event.transform);
+            let container
+
+            function zoomed () {
+                container.attr('transform', d3.event.transform)
             }
 
-            function nodeZoomed() {
+            function nodeZoomed () {
                 // TODO
             }
 
-            function dragStarted(d) {
+            function dragStarted (d) {
                 if (!d3.event.active) {
-                    simulation.alphaTarget(0.3).restart();
+                    simulation.alphaTarget(0.3).restart()
                 }
-                d.fx = d.x;
-                d.fy = d.y;
+                d.fx = d.x
+                d.fy = d.y
             }
 
-            function dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
+            function dragged (d) {
+                d.fx = d3.event.x
+                d.fy = d3.event.y
             }
 
-            function dragEnded(d) {
+            function dragEnded (d) {
                 if (!d3.event.active) {
-                    simulation.alphaTarget(0);
+                    simulation.alphaTarget(0)
                 }
 
-                d.fx = null;
-                d.fy = null;
+                d.fx = null
+                d.fy = null
             }
 
             const svg = d3.select('body')
                 .append('svg')
                 .attr('width', width)
-                .attr('height', height);
+                .attr('height', height)
 
             svg.append('rect')
                 .attr('width', width)
@@ -121,10 +123,10 @@
                 .style('fill', 'none')
                 .call(d3.zoom()
                     .scaleExtent([1 / 3, 5])
-                    .on('zoom', zoomed));
+                    .on('zoom', zoomed))
 
-            document.body.setAttribute('style', 'background: #E7EDEB');
-            container = svg.append('g');
+            document.body.setAttribute('style', 'background: #E7EDEB')
+            container = svg.append('g')
 
             const link = container.append('g')
                 .attr('stroke', '#003a6b')
@@ -132,7 +134,7 @@
                 .data(links)
                 .join('line')
                 .attr('stroke-opacity', rel => rel.weight / 15)
-                .attr('stroke-width', rel => Math.sqrt(rel.weight) * 0.6);
+                .attr('stroke-width', rel => Math.sqrt(rel.weight) * 0.6)
 
             const node = container.append('g')
                 .attr('stroke', '#ffffff')
@@ -146,31 +148,49 @@
                     .on('start', dragStarted)
                     .on('drag', dragged)
                     .on('end', dragEnded))
-                .on('wheel', nodeZoomed);
+                .on('wheel', nodeZoomed)
 
             node.append('title')
-                .text(d => `${d.name} ${d.id}`);
+                .text(d => `${d.name} ${d.id}`)
 
             simulation.on('tick', () => {
                 link
                     .attr('x1', d => d.source.x)
                     .attr('y1', d => d.source.y)
                     .attr('x2', d => d.target.x)
-                    .attr('y2', d => d.target.y);
+                    .attr('y2', d => d.target.y)
                 node
                     .attr('cx', d => d.x)
-                    .attr('cy', d => d.y);
-            });
-        });
+                    .attr('cy', d => d.y)
+            })
+        })
     export default {
         name: 'hello',
-        data() {
+        data () {
             return {
-                msg: 'Welcome to Your Vue.js App',
-            };
-        },
-    };
+                msg: 'Welcome to Your Vue.js App'
+            }
+        }
+    }
 </script>
 
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    h1, h2 {
+        font-weight: normal;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        display: inline-block;
+        margin: 0 10px;
+    }
+
+    a {
+        color: #42b983;
+    }
 </style>
