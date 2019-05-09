@@ -6,8 +6,12 @@ export DATABASE="graph.db"
 
 rm -rf "${NEO4J_HOME}/data/databases/${DATABASE}"
 
+cp ${NEO4J_HOME}/conf/neo4j.conf ${NEO4J_HOME}/conf/neo4j.conf.bak
+echo "dbms.security.auth_enabled=false" >> ${NEO4J_HOME}/conf/neo4j.conf
+
 mkdir workspace 2> /dev/null
 cd workspace
+rm *.csv
 
 wget ${REPOSITORY}/area.csv
 wget ${REPOSITORY}/area_area.csv

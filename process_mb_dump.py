@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict
 
 links = dict()
 link_types = dict()
@@ -8,6 +9,7 @@ label_types = {
     "\\N": ""
 }
 release_groups = dict()
+release_statuses = dict()
 release_to_release_group_map = dict()
 release_types = {
     "\\N": "",
@@ -107,6 +109,7 @@ artist_artist_rel_map = {
     "subgroup": "IS_SUBGROUP_OF",
     "founder": "IS_FOUNDER_OF",
     "involved with": "IS_INVOLVED_WITH",
+    "named after": "IS_NAMED_AFTER",
 }
 
 label_label_rel_map = {
@@ -131,6 +134,11 @@ with open("in/link", "r") as f:
     for line in f:
         cols = line.split("\t")
         links[cols[0]] = cols
+
+with open("in/release_status", "r") as f:
+    for line in f:
+        cols = line.split("\t")
+        release_statuses[cols[0]] = cols
 
 with open("in/link_type", "r") as f:
     for line in f:
@@ -187,7 +195,7 @@ for _, artist in artists.items():
     out_artist.write(",".join((
         artist[1],
         '"' + artist[2].replace("\"", "\"\"") + '"',
-        artist[4] if artist[4] != "\\N" else "",
+        artist[4] if artist[4] != "\\N" else "0",
         "Artist" + (";Group\n" if artist[10] == "2" else "\n")
     )))
 
@@ -216,8 +224,14 @@ with open("in/release_group_primary_type") as f:
         cols = line.split("\t")
         release_types[cols[0]] = ";" + cols[1]
 
+release_group_year = dict()
+with open("in/release_group_meta") as f:
+    for line in f:
+        cols = line.split("\t")
+        release_group_year[cols[0]] = cols[2] if cols[2] != "\\N" else "0"
+
 with open("repo/release.csv", "w") as out:
-    out.write("id:ID(Release),name,:LABEL\n")
+    out.write("id:ID(Release),name,year:int,:LABEL\n")
 
     with open("in/release_group") as f:
         for line in f:
@@ -225,6 +239,7 @@ with open("repo/release.csv", "w") as out:
             out.write(",".join((
                 cols[1],
                 '"' + cols[2].replace("\"", "\"\"") + '"',
+                release_group_year[cols[0]],
                 "Release" + release_types[cols[4]],
             )) + "\n")
 
@@ -233,19 +248,46 @@ with open("repo/release.csv", "w") as out:
 with open("in/release") as f:
     for line in f:
         cols = line.split("\t")
-        release_to_release_group_map[cols[0]] = cols[4]
+        if cols[5] != '\\N' and release_statuses[cols[5]][1] == "Official":
+            release_to_release_group_map[cols[0]] = cols[4]
+
+credit_names = defaultdict(list)
+
+with open("in/artist_credit_name") as f:
+    for line in f:
+        cols = line.split("\t")
+        credit_names[cols[0]].append(artists[cols[2]][1])
 
 with open("tmp/tmp_artist_release.csv", "w") as out:
     out.write(":START_ID(Artist),:END_ID(Release),:TYPE\n")
 
+    # Is this part really necessary?
     with open("in/l_artist_release") as f:
         for line in f:
             cols = line.split("\t")
-            out.write(",".join((
-                artists[cols[2]][1],
-                release_groups[release_to_release_group_map[cols[3]]][1],
-                artist_release_rel_map[link_types[links[cols[1]][1]][6]]
-            )) + "\n")
+            if cols[3] in release_to_release_group_map:
+                out.write(",".join((
+                    artists[cols[2]][1],
+                    release_groups[release_to_release_group_map[cols[3]]][1],
+                    artist_release_rel_map[link_types[links[cols[1]][1]][6]]
+                )) + "\n")
+
+    # Artist credits
+    with open("in/release") as f:
+        for line in f:
+            cols = line.split("\t")
+            if cols[0] in release_to_release_group_map:
+                for credit in credit_names[cols[3]]:
+                    out.write(",".join((
+                        credit,
+                        release_groups[release_to_release_group_map[cols[0]]][1],
+                        "CREDITED_FOR"
+                    )) + "\n")
+
+# Remove dupes
+os.system("(head -n 1 tmp/tmp_artist_release.csv && tail -n +2 tmp/tmp_artist_release.csv"
+          " | sort) | uniq > repo/artist_release.csv && rm tmp/tmp_artist_release.csv")
+
 
 with open("repo/release_release.csv", "w") as out:
     out.write(":START_ID(Release),:END_ID(Release),:TYPE\n")
@@ -259,11 +301,7 @@ with open("repo/release_release.csv", "w") as out:
                 release_release_rel_map[link_types[links[cols[1]][1]][6]]
             )) + "\n")
 
-os.system("(head -n 1 tmp/tmp_artist_release.csv && tail -n +2 tmp/tmp_artist_release.csv"
-          " | sort) | uniq > repo/artist_release.csv && rm tmp/tmp_artist_release.csv")
-
 # ---
-
 
 with open("in/tag") as f:
     with open("repo/tag.csv", "w") as out:
@@ -307,7 +345,7 @@ with open("repo/artist_tag.csv", "w") as out:
             )) + "\n")
 
 with open("repo/tag_tag.csv", "w") as out:
-    out.write(":START_ID(Tag),:END_ID(Tag),weight\n")
+    out.write(":START_ID(Tag),:END_ID(Tag),weight:int\n")
 
     with open("in/tag_relation") as f:
         for line in f:
