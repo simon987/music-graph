@@ -351,7 +351,7 @@ function MusicGraph() {
 let mm = new MusicGraph()
 
 function expandArtist(mbid) {
-    d3.json('http://localhost:3030/artist/related/' + mbid)
+    d3.json('https://mm.simon987.net/api/artist/related/' + mbid)
         .then((r) => {
             originArtist = r.artists.find(a => a.mbid === mbid)
 

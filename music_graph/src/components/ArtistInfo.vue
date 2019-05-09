@@ -23,10 +23,10 @@ let data = {
 }
 
 function reloadInfo(artist) {
-    Vue.http.get('http://localhost:3030/artist/details/' + artist.mbid)
+    Vue.http.get('https://mm.simon987.net/api/artist/details/' + artist.mbid)
         .then(response => {
             response.json().then(info => {
-                info.covers = info.releases.map(mbid => 'http://localhost:3030/cover/' + mbid)
+                info.covers = info.releases.map(mbid => 'https://mm.simon987.net/api/cover/' + mbid)
 
                 data.artistInfo = info
             })
