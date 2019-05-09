@@ -10,6 +10,10 @@ remote.retryWaitSec = 3
 logLevel = 'FINER'
 
 pipeline {
+    agent none
+    environment {
+        HOME='.'
+    }
     stages {
         stage('Build') {
             agent {
