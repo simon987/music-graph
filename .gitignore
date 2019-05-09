@@ -126,3 +126,4 @@ repo/
 tmp/
 workspace/
 worker.json
+*.db
