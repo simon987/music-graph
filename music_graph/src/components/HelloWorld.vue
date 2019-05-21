@@ -1,5 +1,7 @@
 <template>
     <div>
+        <div id="mm"></div>
+        <InputBar v-on:query="onQuery($event)"></InputBar>
         <ArtistInfo v-bind:artist="hoverArtist"/>
     </div>
 </template>
@@ -7,18 +9,27 @@
 <script>
 import ArtistInfo from './ArtistInfo'
 import {MusicGraph} from '../MusicGraph'
+import InputBar from './InputBar'
 
 let data = {
-    hoverArtist: undefined
+    hoverArtist: undefined,
+    mm: undefined
 }
 
-let mm = new MusicGraph(data)
-mm.expandArtist('66fc5bf8-daa4-4241-b378-9bc9077939d2')
-
 export default {
-    components: {ArtistInfo},
+    components: {InputBar, ArtistInfo},
     data() {
         return data
+    },
+    methods: {
+        onQuery: function (e) {
+            console.log(e)
+            this.mm.addArtistByName(e)
+        }
+    },
+    mounted() {
+        this.mm = new MusicGraph(data)
+        this.mm.addArtistByName('Tool')
     }
 }
 </script>
@@ -34,6 +45,8 @@ export default {
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        position: fixed;
+        top: 0;
     }
 
     /* Pan mode */
@@ -46,6 +59,10 @@ export default {
     }
 
     svg.pan-mode .pan-rect {
+        pointer-events: all;
+    }
+
+    svg.menu-mode .dismiss-rect {
         pointer-events: all;
     }
 
@@ -92,7 +109,6 @@ export default {
     /* Label */
     svg .label {
         text-anchor: middle;
-        pointer-events: none;
     }
 
     svg.hover .label:not(.selected) {
@@ -101,5 +117,35 @@ export default {
 
     body {
         background: #E7EDEB;
+    }
+
+    /* test */
+
+    #menu .menu-item {
+        cursor: pointer;
+        fill: orange;
+    }
+
+    #menu .menu-item.hover {
+        fill: darkorange;
+    }
+
+    #menu .menu-item.hover text {
+        font-weight: bold;
+    }
+
+    #menu .menu-item text {
+        text-anchor: middle;
+        fill: white;
+    }
+
+    #menu .menu-icon {
+        fill: black;
+        stroke: black;
+        pointer-events: none;
+    }
+
+    text {
+        pointer-events: none;
     }
 </style>

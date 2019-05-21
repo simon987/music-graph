@@ -4,38 +4,38 @@
             <span>{{artist.name}}</span>
         </div>
         <div>
-            <ImageCarousel
-                v-bind:sources="artistInfo.covers"
+            <AlbumCarousel
+                style="float: left"
+                v-bind:releases="artistInfo.releases"
                 interval="750" />
+            <span>Listeners: {{artist.listeners}}</span>
         </div>
     </el-card>
 </template>
 
 <script>
 import Vue from 'vue'
-import ImageCarousel from './ImageCarousel'
+import AlbumCarousel from './AlbumCarousel'
 
 let data = {
     artistInfo: {
-        releases: [],
-        covers: []
+        releases: []
     }
 }
 
 function reloadInfo(artist) {
-    Vue.http.get('https://mm.simon987.net/api/artist/details/' + artist.mbid)
+    Vue.http.get('http://localhost:3030/artist/details/' + artist.mbid)
         .then(response => {
             response.json().then(info => {
-                info.covers = info.releases.map(mbid => 'https://mm.simon987.net/api/cover/' + mbid)
-
                 data.artistInfo = info
+                data.artistInfo.releases = data.artistInfo.releases.slice(0, 2)
             })
         })
 }
 
 export default {
     name: 'ArtistInfo',
-    components: {ImageCarousel},
+    components: {AlbumCarousel},
     props: ['artist'],
     watch: {
         artist: reloadInfo

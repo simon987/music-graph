@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import icons from './icons'
 
 export const nodeUtils = {
     getNodeType: function (labels) {
@@ -13,6 +14,21 @@ export const nodeUtils = {
     }
 }
 
+// TODO: export somewhere else
+const arc = function (radius, itemNumber, itemCount, width) {
+    itemNumber = itemNumber - 1
+
+    const startAngle = ((2 * Math.PI) / itemCount) * itemNumber
+    const endAngle = startAngle + (2 * Math.PI) / itemCount
+    const innerRadius = Math.max(radius + 8, 20)
+    return d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(innerRadius + width)
+        .startAngle(startAngle)
+        .endAngle(endAngle)
+        .padAngle(0.09)
+}
+
 export function MusicGraph(data) {
     const width = window.innerWidth - 7
     const height = window.innerHeight - 7
@@ -24,7 +40,7 @@ export function MusicGraph(data) {
     this.links = []
     this._originSet = false
 
-    this.svg = d3.select('body')
+    this.svg = d3.select('#mm')
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -32,6 +48,20 @@ export function MusicGraph(data) {
     this.zoomed = () => {
         this.container.attr('transform', d3.event.transform)
     }
+
+    this.dismiss = () => {
+        this.menu.remove()
+        this.nodes.forEach(d => {
+            d.menu = null
+        })
+    }
+
+    this.svg.append('rect')
+        .attr('width', width)
+        .attr('height', height)
+        .classed('dismiss-rect', true)
+        .style('fill', 'none')
+        .on('mousedown', this.dismiss)
 
     this.svg.append('rect')
         .attr('width', width)
@@ -50,6 +80,8 @@ export function MusicGraph(data) {
         .attr('id', 'nodes')
     this.container.append('g')
         .attr('id', 'labels')
+    this.container.append('g')
+        .attr('id', 'menu')
 
     this.dragStarted = (d) => {
         if (!d3.event.active) {
@@ -116,12 +148,62 @@ export function MusicGraph(data) {
     }
 
     this.nodeDbClick = (d) => {
-        if (this.expandedNodes.has(d.id)) {
+        if (d.menu) {
             return
         }
 
-        this.expandedNodes.add(d.id)
-        this.expandArtist(d.mbid)
+        this.svg.classed('menu-mode', true)
+        d.menu = true
+
+        // TODO: Move this somewhere else V V V
+        d.fx = d.x
+        d.fy = d.y
+        const items = [
+            {idx: 0, icon: icons.expand},
+            {idx: 1, icon: icons.release},
+            {idx: 2, icon: icons.hash},
+            {idx: 3, icon: icons.guitar}
+        ]
+
+        const tr = `translate(${d.x},${d.y})`
+        this.menu = this.container.select('#menu')
+            .selectAll('g')
+            .data(items)
+            .enter()
+            .append('g')
+            .classed('menu-item', true)
+            .attr('transform', tr)
+
+        this.menu
+            .append('path')
+            .attr('d', item => arc(35, item.idx, items.length, 1)())
+            .on('mouseover', d => {
+                this.menu.classed('hover', item => item.idx === d.idx)
+            })
+            .on('mouseout', () => this.menu.classed('hover', false))
+            .transition()
+            .duration(200)
+            .attr('d', item => arc(35, item.idx, items.length, 30)())
+
+        const angleOffset = items.length === 3 ? 3.72 : 3.927 // Don't ask
+        this.menu
+            .append('g')
+            .html(d => d.icon)
+            .classed('menu-icon', true)
+            .attr('transform', d =>
+                `translate(${40 * Math.cos(2 * Math.PI * d.idx / items.length + angleOffset) - 10},
+                 ${40 * Math.sin(2 * Math.PI * d.idx / items.length + angleOffset) - 10})`
+            )
+            .transition()
+            .duration(250)
+            .attr('transform', d =>
+                `translate(
+                ${57 * Math.cos(2 * Math.PI * d.idx / items.length + angleOffset) - 10},
+                 ${57 * Math.sin(2 * Math.PI * d.idx / items.length + angleOffset) - 10})`
+            )
+        // ^ ^ ^
+
+        d3.event.preventDefault()
     }
 
     this.simulation = d3.forceSimulation()
@@ -147,9 +229,35 @@ export function MusicGraph(data) {
             .attr('y', d => d.y)
     })
 
-    /**
-     * Add nodes to the graph
-     */
+    this.addNode = function (newNode, relations) {
+        // Convert {id, id} relation to {node, node}
+        if (this.nodeById.has(newNode.id)) {
+            return
+        }
+        this.nodeById.set(newNode.id, newNode)
+        newNode.x = width / 2
+        newNode.y = height / 2
+
+        let linksToAdd = relations
+            .filter(rel => this.nodeById.has(rel.source) && this.nodeById.has(rel.target))
+            .map(({weight, source, target}) => ({
+                source: this.nodeById.get(source),
+                target: this.nodeById.get(target),
+                weight: weight
+            }))
+
+        // Update source/targetLinks
+        for (const {source, target} of linksToAdd) {
+            source.sourceLinks.add(target.id)
+            target.targetLinks.add(source.id)
+        }
+
+        this.nodes.push(newNode)
+        this.links.push(...linksToAdd)
+
+        this._update()
+    }
+
     this.addNodes = function (newNodes, relations, originId) {
         // Update node map, ignore existing nodes
         let nodesToAdd = []
@@ -191,7 +299,7 @@ export function MusicGraph(data) {
         this.nodes.push(...nodesToAdd)
         this.links.push(...linksToAdd)
 
-        if (!this._originSet) {
+        if (!this._originSet && originId) {
             this._setOrigin()
             this._originSet = true
         }
@@ -238,8 +346,8 @@ export function MusicGraph(data) {
                     (1.2 / d.weight) * (94 * this.expandedNodes.size))
                 )
             )
-        this.simulation
-            .restart()
+
+        this.simulation.alphaTarget(0.01).restart()
 
         // Add new links
         this.link = this.container.select('#links')
@@ -269,6 +377,7 @@ export function MusicGraph(data) {
             .on('mouseover', this.nodeHover)
             .on('mouseout', this.nodeOut)
             .on('dblclick', this.nodeDbClick)
+            .on('contextmenu', this.nodeDbClick)
         this.node = nodeEnter.merge(this.node)
 
         // Add new labels
@@ -323,7 +432,7 @@ export function MusicGraph(data) {
 
     this.expandArtist = function (mbid) {
         // todo use http client
-        d3.json('https://mm.simon987.net/api/artist/related/' + mbid)
+        d3.json('http://localhost:3030/artist/related/' + mbid)
             .then((r) => {
                 this.originArtist = r.artists.find(a => a.mbid === mbid)
 
@@ -340,6 +449,24 @@ export function MusicGraph(data) {
                 })
 
                 this.addNodes(nodes, r.relations, this.originArtist.id)
+            })
+    }
+
+    this.addArtistByName = function (name) {
+        // todo use http client
+        d3.json('http://localhost:3030/artist/related_by_name/' + name)
+            .then((r) => {
+                const node = r.artists.find(a => a.name === name)
+
+                this.addNode({
+                    id: node.id,
+                    mbid: node.mbid,
+                    name: node.name,
+                    listeners: node.listeners,
+                    type: nodeUtils.getNodeType(node.labels),
+                    sourceLinks: new Set(),
+                    targetLinks: new Set()
+                }, r.relations)
             })
     }
 
