@@ -1,18 +1,6 @@
 import * as d3 from 'd3'
 import icons from './icons'
-
-export const nodeUtils = {
-    getNodeType: function (labels) {
-        if (labels.find(l => l === 'Tag')) {
-            return 'Tag'
-        } else if (labels.find(l => l === 'Group')) {
-            return 'Group'
-        } else if (labels.find(l => l === 'Artist')) {
-            return 'Artist'
-        }
-        return undefined
-    }
-}
+import {MusicGraphApi} from './MusicGraphApi'
 
 // TODO: export somewhere else
 const arc = function (radius, itemNumber, itemCount, width) {
@@ -39,11 +27,14 @@ export function MusicGraph(data) {
     this.nodes = []
     this.links = []
     this._originSet = false
+    this.api = new MusicGraphApi()
 
-    this.svg = d3.select('#mm')
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height)
+    this.simulation = d3.forceSimulation()
+        .force('charge', d3.forceManyBody())
+        .force('collide', d3.forceCollide()
+            .radius(50)
+            .strength(1))
+        .force('center', d3.forceCenter(width / 2, height / 2))
 
     this.zoomed = () => {
         this.container.attr('transform', d3.event.transform)
@@ -52,9 +43,16 @@ export function MusicGraph(data) {
     this.dismiss = () => {
         this.menu.remove()
         this.nodes.forEach(d => {
+            d.fx = null
+            d.fy = null
             d.menu = null
         })
     }
+
+    this.svg = d3.select('#mm')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
 
     this.svg.append('rect')
         .attr('width', width)
@@ -74,16 +72,15 @@ export function MusicGraph(data) {
 
     this.container = this.svg.append('g').attr('id', 'container')
 
-    this.container.append('g')
-        .attr('id', 'links')
-    this.container.append('g')
-        .attr('id', 'nodes')
-    this.container.append('g')
-        .attr('id', 'labels')
-    this.container.append('g')
-        .attr('id', 'menu')
+    this.container.append('g').attr('id', 'links')
+    this.container.append('g').attr('id', 'nodes')
+    this.container.append('g').attr('id', 'labels')
+    this.container.append('g').attr('id', 'menu')
 
     this.dragStarted = (d) => {
+        if (d.menu) {
+            return
+        }
         if (!d3.event.active) {
             this.simulation.alphaTarget(0.3).restart()
         }
@@ -92,6 +89,9 @@ export function MusicGraph(data) {
     }
 
     this.dragged = (d) => {
+        if (d.menu) {
+            return
+        }
         d.fx = d3.event.x
         d.fy = d3.event.y
     }
@@ -147,17 +147,8 @@ export function MusicGraph(data) {
         this.node.classed('hover', false)
     }
 
-    this.nodeDbClick = (d) => {
-        if (d.menu) {
-            return
-        }
-
-        this.svg.classed('menu-mode', true)
-        d.menu = true
-
-        // TODO: Move this somewhere else V V V
-        d.fx = d.x
-        d.fy = d.y
+    this.makeMenu = function (d) {
+        // Todo global const?
         const items = [
             {idx: 0, icon: icons.expand},
             {idx: 1, icon: icons.release},
@@ -201,33 +192,23 @@ export function MusicGraph(data) {
                 ${57 * Math.cos(2 * Math.PI * d.idx / items.length + angleOffset) - 10},
                  ${57 * Math.sin(2 * Math.PI * d.idx / items.length + angleOffset) - 10})`
             )
-        // ^ ^ ^
-
-        d3.event.preventDefault()
     }
 
-    this.simulation = d3.forceSimulation()
-        .force('charge', d3.forceManyBody())
-        .force('collide', d3.forceCollide()
-            .radius(50)
-            .strength(1))
-        .force('center', d3.forceCenter(width / 2, height / 2))
+    this.nodeDbClick = (d) => {
+        if (d.menu) {
+            return
+        }
 
-    this.simulation.stop()
+        this.svg.classed('menu-mode', true)
+        d.menu = true
 
-    this.simulation.on('tick', () => {
-        this.link
-            .attr('x1', d => d.source.x)
-            .attr('y1', d => d.source.y)
-            .attr('x2', d => d.target.x)
-            .attr('y2', d => d.target.y)
-        this.node
-            .attr('cx', d => d.x)
-            .attr('cy', d => d.y)
-        this.label
-            .attr('x', d => d.x)
-            .attr('y', d => d.y)
-    })
+        // todo: unfreeze node on dismiss
+        d.fx = d.x
+        d.fy = d.y
+
+        this.makeMenu(d)
+        d3.event.preventDefault()
+    }
 
     this.addNode = function (newNode, relations) {
         // Convert {id, id} relation to {node, node}
@@ -300,6 +281,7 @@ export function MusicGraph(data) {
         this.links.push(...linksToAdd)
 
         if (!this._originSet && originId) {
+            this.originArtist = this.nodeById.get(originId)
             this._setOrigin()
             this._originSet = true
         }
@@ -307,9 +289,6 @@ export function MusicGraph(data) {
         this._update()
     }
 
-    /**
-     * Remove nodes from the graph
-     */
     this.removeNodes = function (idsToRemove) {
         let idSetToRemove = new Set(idsToRemove)
 
@@ -431,44 +410,34 @@ export function MusicGraph(data) {
     }
 
     this.expandArtist = function (mbid) {
-        // todo use http client
-        d3.json('http://localhost:3030/artist/related/' + mbid)
-            .then((r) => {
-                this.originArtist = r.artists.find(a => a.mbid === mbid)
-
-                const nodes = r.artists.map((row) => {
-                    return {
-                        id: row.id,
-                        mbid: row.mbid,
-                        name: row.name,
-                        listeners: row.listeners,
-                        type: nodeUtils.getNodeType(row.labels),
-                        sourceLinks: new Set(),
-                        targetLinks: new Set()
-                    }
-                })
-
-                this.addNodes(nodes, r.relations, this.originArtist.id)
+        this.api.getRelatedByMbid(mbid)
+            .then(data => {
+                this.addNodes(data.newNodes, data.relations, data.node.id)
             })
     }
 
     this.addArtistByName = function (name) {
-        // todo use http client
-        d3.json('http://localhost:3030/artist/related_by_name/' + name)
-            .then((r) => {
-                const node = r.artists.find(a => a.name === name)
-
-                this.addNode({
-                    id: node.id,
-                    mbid: node.mbid,
-                    name: node.name,
-                    listeners: node.listeners,
-                    type: nodeUtils.getNodeType(node.labels),
-                    sourceLinks: new Set(),
-                    targetLinks: new Set()
-                }, r.relations)
+        this.api.getRelatedByName(name)
+            .then(data => {
+                this.addNode(data.node, data.relations)
             })
     }
+
+    this.simulation.stop()
+
+    this.simulation.on('tick', () => {
+        this.link
+            .attr('x1', d => d.source.x)
+            .attr('y1', d => d.source.y)
+            .attr('x2', d => d.target.x)
+            .attr('y2', d => d.target.y)
+        this.node
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
+        this.label
+            .attr('x', d => d.x)
+            .attr('y', d => d.y + 5)
+    })
 
     this._update()
     this.setupKeyBindings()

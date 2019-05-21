@@ -7,41 +7,41 @@
             <AlbumCarousel
                 style="float: left"
                 v-bind:releases="artistInfo.releases"
-                interval="750" />
+                interval="750"/>
             <span>Listeners: {{artist.listeners}}</span>
         </div>
     </el-card>
 </template>
 
 <script>
-import Vue from 'vue'
 import AlbumCarousel from './AlbumCarousel'
-
-let data = {
-    artistInfo: {
-        releases: []
-    }
-}
-
-function reloadInfo(artist) {
-    Vue.http.get('http://localhost:3030/artist/details/' + artist.mbid)
-        .then(response => {
-            response.json().then(info => {
-                data.artistInfo = info
-                data.artistInfo.releases = data.artistInfo.releases.slice(0, 2)
-            })
-        })
-}
+import {MusicGraphApi} from '../MusicGraphApi'
 
 export default {
     name: 'ArtistInfo',
     components: {AlbumCarousel},
     props: ['artist'],
     watch: {
-        artist: reloadInfo
+        artist: function (a) {
+            this.reloadInfo(a)
+        }
     },
     data() {
-        return data
+        return {
+            artistInfo: {
+                releases: []
+            },
+            api: new MusicGraphApi()
+        }
+    },
+    methods: {
+        reloadInfo: function (artist) {
+            this.api.getArtistDetails(artist.mbid)
+                .then(info => {
+                    this.artistInfo = info
+                    this.artistInfo.releases = this.artistInfo.releases.slice(0, 2)
+                })
+        }
     }
 }
 </script>

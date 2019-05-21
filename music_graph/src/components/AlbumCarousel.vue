@@ -10,7 +10,7 @@
                     alt=""
                     width="128"
                     height="128"
-                    v-bind:src="'http://localhost:3030/cover/' + release.mbid"
+                    v-bind:src="api.resolveCoverUrl(release.mbid)"
                 >
                 <figcaption>{{release.name}} ({{release.year}})</figcaption>
             </figure>
@@ -19,16 +19,17 @@
 </template>
 
 <script>
-let data = {
-    current: '',
-    index: 0
-}
+import {MusicGraphApi} from '../MusicGraphApi'
 
 export default {
     name: 'AlbumCarousel',
     props: ['releases', 'interval'],
     data() {
-        return data
+        return {
+            api: new MusicGraphApi(),
+            current: '',
+            index: 0
+        }
     },
     mounted() {
         setInterval(() => {
@@ -37,17 +38,17 @@ export default {
     },
     watch: {
         releases: () => {
-            data.index = 0
+            this.index = 0
         }
     },
     methods: {
         tick() {
-            if (data.index === this.releases.length - 1) {
-                data.index = 0
+            if (this.index === this.releases.length - 1) {
+                this.index = 0
             }
 
-            data.index += 1
-            data.current = this.releases[data.index].mbid
+            this.index += 1
+            this.current = this.releases[this.index].mbid
         }
     }
 }
