@@ -47,6 +47,7 @@ export function MusicGraph(data) {
             d.fy = null
             d.menu = null
         })
+        this.svg.classed('menu-mode', false)
     }
 
     this.svg = d3.select('#mm')
@@ -97,6 +98,9 @@ export function MusicGraph(data) {
     }
 
     this.dragEnded = (d) => {
+        if (d.menu) {
+            return
+        }
         if (!d3.event.active) {
             this.simulation.alphaTarget(0)
         }
@@ -150,10 +154,10 @@ export function MusicGraph(data) {
     this.makeMenu = function (d) {
         // Todo global const?
         const items = [
-            {idx: 0, icon: icons.expand},
-            {idx: 1, icon: icons.release},
-            {idx: 2, icon: icons.hash},
-            {idx: 3, icon: icons.guitar}
+            {idx: 0, icon: icons.expand, title: 'Related'},
+            {idx: 1, icon: icons.release, title: 'Releases'},
+            {idx: 2, icon: icons.hash, title: 'Tags'},
+            {idx: 3, icon: icons.guitar, title: 'Members'}
         ]
 
         const tr = `translate(${d.x},${d.y})`
@@ -165,9 +169,10 @@ export function MusicGraph(data) {
             .classed('menu-item', true)
             .attr('transform', tr)
 
-        this.menu
+        const path = this.menu
             .append('path')
             .attr('d', item => arc(35, item.idx, items.length, 1)())
+        path
             .on('mouseover', d => {
                 this.menu.classed('hover', item => item.idx === d.idx)
             })
@@ -175,6 +180,9 @@ export function MusicGraph(data) {
             .transition()
             .duration(200)
             .attr('d', item => arc(35, item.idx, items.length, 30)())
+        path
+            .append('title')
+            .text(item => item.title)
 
         const angleOffset = items.length === 3 ? 3.72 : 3.927 // Don't ask
         this.menu
@@ -195,7 +203,7 @@ export function MusicGraph(data) {
     }
 
     this.nodeDbClick = (d) => {
-        if (d.menu) {
+        if (this.svg.classed('menu-mode')) {
             return
         }
 
