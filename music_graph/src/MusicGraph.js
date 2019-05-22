@@ -184,22 +184,15 @@ export function MusicGraph(data) {
             .append('title')
             .text(item => item.title)
 
-        const angleOffset = items.length === 3 ? 3.72 : 3.927 // Don't ask
+        const centroid = (idx, rad) => arc(rad, idx, items.length, 30).centroid()
         this.menu
             .append('g')
             .html(d => d.icon)
             .classed('menu-icon', true)
-            .attr('transform', d =>
-                `translate(${40 * Math.cos(2 * Math.PI * d.idx / items.length + angleOffset) - 10},
-                 ${40 * Math.sin(2 * Math.PI * d.idx / items.length + angleOffset) - 10})`
-            )
+            .attr('transform', d => `translate(${centroid(d.idx, 1)[0] - 13}, ${centroid(d.idx, 1)[1] - 13})`)
             .transition()
             .duration(250)
-            .attr('transform', d =>
-                `translate(
-                ${57 * Math.cos(2 * Math.PI * d.idx / items.length + angleOffset) - 10},
-                 ${57 * Math.sin(2 * Math.PI * d.idx / items.length + angleOffset) - 10})`
-            )
+            .attr('transform', d => `translate(${centroid(d.idx, 35)[0] - 10}, ${centroid(d.idx, 35)[1] - 10})`)
     }
 
     this.nodeDbClick = (d) => {
