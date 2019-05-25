@@ -183,8 +183,10 @@ export function MusicGraph(data) {
                 fn: (d) => {
                     this.api.getRelatedByMbid(d.mbid)
                         .then(data => {
-                            this.expandedNodes.add(d.id)
-                            this.addNodes(data.newNodes, data.relations, d.id)
+                            if (data.newNodes.length > 0) {
+                                this.expandedNodes.add(d.id)
+                                this.addNodes(data.newNodes, data.relations, d.id)
+                            }
                             d.relatedExpanded = true
                         })
                 }
