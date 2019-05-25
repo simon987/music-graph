@@ -3,6 +3,7 @@
         <div id="mm"></div>
         <InputBar v-on:query="onQuery($event)"></InputBar>
         <ArtistInfo v-bind:artist="hoverArtist"/>
+        <canvas id="textMeasurementCanvas"></canvas>
     </div>
 </template>
 
@@ -74,13 +75,12 @@ export default {
     /* Link */
     svg .link.selected {
         stroke-width: 2;
-        stroke-opacity: 1;
     }
 
     svg .link {
-        stroke: orange;
+        stroke: #FFE082;
         pointer-events: none;
-        stroke-opacity: 1;
+        stroke-opacity: 0.3;
         stroke-width: 1;
     }
 
@@ -91,11 +91,11 @@ export default {
 
     /* Node */
     svg .node.selected {
-        stroke: red;
+        stroke: #7C4DFF;
     }
 
     svg .node.hover {
-        stroke: red;
+        stroke: #7C4DFF;
     }
 
     svg.hover .node:not(.selected):not(.hover) {
@@ -104,11 +104,22 @@ export default {
 
     svg .node {
         fill: transparent;
+        stroke-width: 2;
     }
 
     /* Label */
     svg .label {
         text-anchor: middle;
+        font-family: Tahoma, sans-serif;
+        font-size: 11px;
+    }
+
+    svg .label.release {
+        fill: darkgrey;
+    }
+
+    svg .label.tag {
+        fill: darkgrey;
     }
 
     svg.hover .label:not(.selected) {
@@ -116,27 +127,18 @@ export default {
     }
 
     body {
-        background: #E7EDEB;
+        background: #ffffff;
     }
 
     /* test */
 
     #menu .menu-item {
         cursor: pointer;
-        fill: orange;
+        fill: #FFB300;
     }
 
     #menu .menu-item.hover {
-        fill: darkorange;
-    }
-
-    #menu .menu-item.hover text {
-        font-weight: bold;
-    }
-
-    #menu .menu-item text {
-        text-anchor: middle;
-        fill: white;
+        fill: #FF8F00;
     }
 
     #menu .menu-icon {

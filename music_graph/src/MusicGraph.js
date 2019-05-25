@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 import icons from './icons'
 import {MusicGraphApi} from './MusicGraphApi'
+import {fitCaptionIntoCircle} from './graphGeometry'
 
 // TODO: export somewhere else
 const arc = function (radius, itemNumber, itemCount, width) {
@@ -32,7 +33,7 @@ export function MusicGraph(data) {
     this.simulation = d3.forceSimulation()
         .force('charge', d3.forceManyBody())
         .force('collide', d3.forceCollide()
-            .radius(50)
+            .radius(40)
             .strength(1))
         .force('center', d3.forceCenter(width / 2, height / 2))
 
@@ -138,9 +139,9 @@ export function MusicGraph(data) {
             n.targetLinks.has(d.id))
 
         this.label.classed('selected', n =>
-            n.sourceLinks.has(d.id) ||
-            n.targetLinks.has(d.id) ||
-            n.id === d.id)
+            n.node.sourceLinks.has(d.id) ||
+            n.node.targetLinks.has(d.id) ||
+            n.node.id === d.id)
 
         this.node.classed('hover', n => n.id === d.id)
 
@@ -182,8 +183,8 @@ export function MusicGraph(data) {
                 fn: (d) => {
                     this.api.getRelatedByMbid(d.mbid)
                         .then(data => {
-                            this.addNodes(data.newNodes, data.relations, d.id)
                             this.expandedNodes.add(d.id)
+                            this.addNodes(data.newNodes, data.relations, d.id)
                             d.relatedExpanded = true
                         })
                 }
@@ -408,12 +409,10 @@ export function MusicGraph(data) {
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
                 .strength(l => l.weight)
-                .distance(d => Math.min(
-                    (1.2 / d.weight) * (94 * (this.expandedNodes.size + 1)))
-                )
+                .distance(d => (1.15 / d.weight) * (82 * (this.expandedNodes.size + 1)))
             )
 
-        this.simulation.alphaTarget(0.01).restart()
+        this.simulation.alphaTarget(0.03).restart()
 
         // Add new links
         this.link = this.container.select('#links')
@@ -451,14 +450,16 @@ export function MusicGraph(data) {
         // Add new labels
         this.label = this.container.select('#labels')
             .selectAll('.label')
-            .data(this.nodes)
+            .data([].concat(...this.nodes.map(d => fitCaptionIntoCircle(d.name, d))))
         this.label.exit().remove()
         this.label = this.label
             .enter()
             .append('text')
             .merge(this.label)
-            .text(d => d.name)
             .classed('label', true)
+            .classed('release', d => d.node.type === 'Album' || d.node.type === 'EP' || d.node.type === 'Single')
+            .classed('tag', d => d.node.type === 'Tag')
+            .text(d => d.text)
     }
 
     this.setupKeyBindings = function () {
@@ -514,8 +515,8 @@ export function MusicGraph(data) {
             .attr('cx', d => d.x)
             .attr('cy', d => d.y)
         this.label
-            .attr('x', d => d.x)
-            .attr('y', d => d.y + 5)
+            .attr('x', d => Math.round(d.node.x))
+            .attr('y', d => d.node.y + d.baseline)
     })
 
     this._update()

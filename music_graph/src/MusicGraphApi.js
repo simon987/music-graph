@@ -48,17 +48,7 @@ const nodeUtils = {
         }
     },
     radius: function (type) {
-        if (type === 'Group') {
-            return 35
-        } else if (type === 'Artist') {
-            return 25
-        } else if (type === 'Tag') {
-            return 20
-        } else if (type === 'Album') {
-            return 20
-        } else if (type === 'EP' || type === 'Single') {
-            return 15
-        }
+        return 35
     }
 }
 
