@@ -113,10 +113,9 @@ export function MusicGraph(data) {
     }
 
     this.nodeHover = (d) => {
-        this._data.hoverArtist = d
-
         let srcLinks = this.links.filter(link => link.source.id === d.id)
         let targetLinks = this.links.filter(link => link.target.id === d.id)
+
         this._data.hoverLinks = srcLinks.map(l => {
             return {
                 match: (l.weight * 100).toFixed(2) + '%',
@@ -144,6 +143,10 @@ export function MusicGraph(data) {
             n.id === d.id)
 
         this.node.classed('hover', n => n.id === d.id)
+
+        if (d.type === 'Group' && d.type === 'Artist') {
+            this._data.hoverArtist = d
+        }
     }
 
     this.nodeOut = () => {
@@ -155,11 +158,11 @@ export function MusicGraph(data) {
     }
 
     this.makeMenu = function (d) {
-        // Todo global const?
-        const items = []
+        let items = []
+        let i = 0
         if (!d.membersExpanded) {
             items.push({
-                idx: 3,
+                idx: i++,
                 icon: icons.guitar,
                 title: 'Members',
                 fn: (d) => {
@@ -173,7 +176,7 @@ export function MusicGraph(data) {
         }
         if (!d.relatedExpanded) {
             items.push({
-                idx: 0,
+                idx: i++,
                 icon: icons.expand,
                 title: 'Related',
                 fn: (d) => {
@@ -191,7 +194,7 @@ export function MusicGraph(data) {
         }
         if (!d.releasesExpanded) {
             items.push({
-                idx: 1,
+                idx: i++,
                 icon: icons.release,
                 title: 'Releases',
                 fn: (d) => {
@@ -208,7 +211,7 @@ export function MusicGraph(data) {
         }
         if (!d.tagsExpanded) {
             items.push({
-                idx: 2,
+                idx: i++,
                 icon: icons.hash,
                 title: 'Tags',
                 fn: (d) => {
@@ -224,7 +227,7 @@ export function MusicGraph(data) {
             })
         }
         items.push({
-            idx: 4,
+            idx: i,
             icon: icons.delete,
             title: 'Remove from graph',
             fn: (d) => {
@@ -415,8 +418,8 @@ export function MusicGraph(data) {
         this.link = this.link
             .enter()
             .append('line')
-            .classed('link', true)
             .merge(this.link)
+            .classed('link', true)
 
         // Add new nodes
         this.node = this.container.select('#nodes')
@@ -427,6 +430,7 @@ export function MusicGraph(data) {
         this.node = this.node
             .enter()
             .append('circle')
+            .merge(this.node)
             .classed('node', true)
             .attr('r', d => d.radius)
             .attr('stroke', d => this._getNodeColor(d))
@@ -438,19 +442,18 @@ export function MusicGraph(data) {
             .on('mouseout', this.nodeOut)
             .on('dblclick', this.nodeDbClick)
             .on('contextmenu', this.nodeDbClick)
-            .merge(this.node)
 
         // Add new labels
         this.label = this.container.select('#labels')
             .selectAll('.label')
             .data(this.nodes)
-        this.label.exit().remove(0)
+        this.label.exit().remove()
         this.label = this.label
             .enter()
             .append('text')
+            .merge(this.label)
             .text(d => d.name)
             .classed('label', true)
-            .merge(this.label)
     }
 
     this.setupKeyBindings = function () {
@@ -485,17 +488,6 @@ export function MusicGraph(data) {
             return '#1cb3c8'
         }
         return null
-    }
-
-    this._getNodeRadius = function (node) {
-        // Unused
-    }
-
-    this.expandArtist = function (mbid) {
-        this.api.getRelatedByMbid(mbid)
-            .then(data => {
-                this.addNodes(data.newNodes, data.relations, data.node.id)
-            })
     }
 
     this.addArtistByName = function (name) {

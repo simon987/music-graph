@@ -59,8 +59,6 @@ const nodeUtils = {
 
 export function MusicGraphApi() {
     this.url = window.location.protocol + '//' + window.location.hostname + '/api'
-    // TODO: rmv
-    this.url = 'http://localhost:3030'
 
     this.resolveCoverUrl = function (mbid) {
         return this.url + '/cover/' + mbid
@@ -71,7 +69,7 @@ export function MusicGraphApi() {
     }
 
     this.getRelatedByName = function (name) {
-        return d3.json(this.url + '/artist/related_by_name/' + name)
+        return d3.json(this.url + '/artist/related_by_name/' + name.replace(/ /g, '+'))
             .then((r) => {
                 return {
                     node: nodeUtils.fromRawDict(r.artists.find(a => a.name === name)),
