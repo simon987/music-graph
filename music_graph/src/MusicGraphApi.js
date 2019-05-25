@@ -1,4 +1,8 @@
 import * as d3 from 'd3'
+import {genres} from './genres'
+
+const IGNORE_DATES_TAG = true
+const ONLY_GENRE_TAGS = true
 
 const nodeUtils = {
     getNodeType: function (labels) {
@@ -35,6 +39,7 @@ const nodeUtils = {
             return {
                 id: data.id,
                 name: data.name,
+                mbid: data.mbid,
                 type: type,
                 sourceLinks: new Set(),
                 targetLinks: new Set(),
@@ -116,15 +121,30 @@ export function MusicGraphApi() {
             })
     }
 
+    this._filterTags = function (tags) {
+        if (ONLY_GENRE_TAGS) {
+            return tags.filter(tag => genres.has(tag.name))
+        } else if (IGNORE_DATES_TAG) {
+            return tags.filter(tag => isNaN(tag.name) && isNaN(tag.name.slice(0, -1)))
+        }
+        return tags
+    }
+
+    this._addTagLabel = function (objects) {
+        return objects.map(tag => {
+            tag.labels = ['Tag']
+            return tag
+        })
+    }
+
     this.getArtistTags = function (mbid, originId) {
         return d3.json(this.url + '/artist/details/' + mbid)
             .then((r) => {
+                const tags = this._filterTags(r.tags)
+
                 return {
-                    newNodes: r.tags.map(tag => {
-                        tag.labels = ['Tag']
-                        return tag
-                    }).map(nodeUtils.fromRawDict),
-                    relations: r.tags.map(t => {
+                    newNodes: this._addTagLabel(tags).map(nodeUtils.fromRawDict),
+                    relations: tags.map(t => {
                         return {
                             source: originId,
                             target: t.id,
@@ -141,6 +161,24 @@ export function MusicGraphApi() {
                 return {
                     newNodes: r.artists.map(nodeUtils.fromRawDict),
                     relations: r.relations
+                }
+            })
+    }
+
+    this.getReleaseDetails = function (mbid, originId) {
+        return d3.json(this.url + '/release/details/' + mbid)
+            .then((r) => {
+                const tags = this._filterTags(r.tags)
+
+                return {
+                    newNodes: this._addTagLabel(tags).map(nodeUtils.fromRawDict),
+                    relations: tags.map(t => {
+                        return {
+                            source: originId,
+                            target: t.id,
+                            weight: t.weight
+                        }
+                    })
                 }
             })
     }

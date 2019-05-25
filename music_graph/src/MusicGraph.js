@@ -78,8 +78,8 @@ export function MusicGraph(data) {
 
     this.container.append('g').attr('id', 'links')
     this.container.append('g').attr('id', 'nodes')
-    this.container.append('g').attr('id', 'labels')
     this.container.append('g').attr('id', 'menu')
+    this.container.append('g').attr('id', 'labels')
 
     this.dragStarted = (d) => {
         if (d.menu) {
@@ -144,7 +144,7 @@ export function MusicGraph(data) {
 
         this.node.classed('hover', n => n.id === d.id)
 
-        if (d.type === 'Group' && d.type === 'Artist') {
+        if (d.type === 'Group' || d.type === 'Artist') {
             this._data.hoverArtist = d
         }
     }
@@ -160,7 +160,7 @@ export function MusicGraph(data) {
     this.makeMenu = function (d) {
         let items = []
         let i = 0
-        if (!d.membersExpanded) {
+        if (d.type === 'Group' && !d.membersExpanded) {
             items.push({
                 idx: i++,
                 icon: icons.guitar,
@@ -174,15 +174,12 @@ export function MusicGraph(data) {
                 }
             })
         }
-        if (!d.relatedExpanded) {
+        if ((d.type === 'Group' || d.type === 'Artist') && !d.relatedExpanded) {
             items.push({
                 idx: i++,
                 icon: icons.expand,
                 title: 'Related',
                 fn: (d) => {
-                    if (d.relatedExpanded) {
-                        return
-                    }
                     this.api.getRelatedByMbid(d.mbid)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
@@ -192,15 +189,12 @@ export function MusicGraph(data) {
                 }
             })
         }
-        if (!d.releasesExpanded) {
+        if ((d.type === 'Artist' || d.type === 'Group') && !d.releasesExpanded) {
             items.push({
                 idx: i++,
                 icon: icons.release,
                 title: 'Releases',
                 fn: (d) => {
-                    if (d.releasesExpanded) {
-                        return
-                    }
                     this.api.getArtistReleases(d.mbid, d.id)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
@@ -209,21 +203,32 @@ export function MusicGraph(data) {
                 }
             })
         }
-        if (!d.tagsExpanded) {
-            items.push({
-                idx: i++,
-                icon: icons.hash,
-                title: 'Tags',
-                fn: (d) => {
-                    if (d.tagsExpanded) {
-                        return
-                    }
+        if ((d.type === 'Album' || d.type === 'EP' || d.type === 'Single' || d.type === 'Group' || d.type === 'Artist') &&
+            !d.tagsExpanded) {
+            let fn
+            if (d.type === 'Group' || d.type === 'Artist') {
+                fn = (d) => {
                     this.api.getArtistTags(d.mbid, d.id)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
                             d.tagsExpanded = true
                         })
                 }
+            } else if (d.type === 'Album' || d.type === 'EP' || d.type === 'Single') {
+                fn = (d) => {
+                    this.api.getReleaseDetails(d.mbid, d.id)
+                        .then(data => {
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                            d.tagsExpanded = true
+                        })
+                }
+            }
+
+            items.push({
+                idx: i++,
+                icon: icons.hash,
+                title: 'Tags',
+                fn: fn
             })
         }
         items.push({
