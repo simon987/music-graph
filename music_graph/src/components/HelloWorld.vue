@@ -80,13 +80,13 @@ export default {
     svg .link {
         stroke: orange;
         pointer-events: none;
-        stroke-opacity: 0.7;
+        stroke-opacity: 1;
         stroke-width: 1;
     }
 
     svg.hover .link:not(.selected) {
-        stroke-opacity: 0.2;
-        stroke-width: 0.1;
+        stroke-opacity: 0.5;
+        stroke-width: 0.2;
     }
 
     /* Node */
@@ -112,7 +112,7 @@ export default {
     }
 
     svg.hover .label:not(.selected) {
-        display: none;
+        fill-opacity: 0.2;
     }
 
     body {

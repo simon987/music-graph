@@ -42,11 +42,14 @@ export function MusicGraph(data) {
 
     this.dismiss = () => {
         this.menu.remove()
-        this.nodes.forEach(d => {
-            d.fx = null
-            d.fy = null
-            d.menu = null
-        })
+        const menuNode = this.nodes.find(d => d.menu)
+        if (menuNode !== undefined) {
+            menuNode.menu = null
+            setTimeout(() => {
+                menuNode.fx = null
+                menuNode.fy = null
+            }, 600)
+        }
         this.svg.classed('menu-mode', false)
     }
 
@@ -153,33 +156,105 @@ export function MusicGraph(data) {
 
     this.makeMenu = function (d) {
         // Todo global const?
-        const items = [
-            {idx: 0, icon: icons.expand, title: 'Related'},
-            {idx: 1, icon: icons.release, title: 'Releases'},
-            {idx: 2, icon: icons.hash, title: 'Tags'},
-            {idx: 3, icon: icons.guitar, title: 'Members'}
-        ]
+        const items = []
+        if (!d.membersExpanded) {
+            items.push({
+                idx: 3,
+                icon: icons.guitar,
+                title: 'Members',
+                fn: (d) => {
+                    this.api.getGroupMembers(d.mbid, d.id)
+                        .then(data => {
+                            d.membersExpanded = true
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                        })
+                }
+            })
+        }
+        if (!d.relatedExpanded) {
+            items.push({
+                idx: 0,
+                icon: icons.expand,
+                title: 'Related',
+                fn: (d) => {
+                    if (d.relatedExpanded) {
+                        return
+                    }
+                    this.api.getRelatedByMbid(d.mbid)
+                        .then(data => {
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                            this.expandedNodes.add(d.id)
+                            d.relatedExpanded = true
+                        })
+                }
+            })
+        }
+        if (!d.releasesExpanded) {
+            items.push({
+                idx: 1,
+                icon: icons.release,
+                title: 'Releases',
+                fn: (d) => {
+                    if (d.releasesExpanded) {
+                        return
+                    }
+                    this.api.getArtistReleases(d.mbid, d.id)
+                        .then(data => {
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                            d.releasesExpanded = true
+                        })
+                }
+            })
+        }
+        if (!d.tagsExpanded) {
+            items.push({
+                idx: 2,
+                icon: icons.hash,
+                title: 'Tags',
+                fn: (d) => {
+                    if (d.tagsExpanded) {
+                        return
+                    }
+                    this.api.getArtistTags(d.mbid, d.id)
+                        .then(data => {
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                            d.tagsExpanded = true
+                        })
+                }
+            })
+        }
+        items.push({
+            idx: 4,
+            icon: icons.delete,
+            title: 'Remove from graph',
+            fn: (d) => {
+                this.removeNodes([d.id])
+            }
+        })
 
-        const tr = `translate(${d.x},${d.y})`
         this.menu = this.container.select('#menu')
             .selectAll('g')
             .data(items)
             .enter()
             .append('g')
             .classed('menu-item', true)
-            .attr('transform', tr)
+            .attr('transform', `translate(${d.x},${d.y})`)
 
         const path = this.menu
             .append('path')
-            .attr('d', item => arc(35, item.idx, items.length, 1)())
+            .attr('d', item => arc(d.radius, item.idx, items.length, 1)())
         path
             .on('mouseover', d => {
                 this.menu.classed('hover', item => item.idx === d.idx)
             })
             .on('mouseout', () => this.menu.classed('hover', false))
+            .on('mousedown', tab => {
+                this.dismiss()
+                return tab.fn(d)
+            })
             .transition()
             .duration(200)
-            .attr('d', item => arc(35, item.idx, items.length, 30)())
+            .attr('d', item => arc(d.radius, item.idx, items.length, 30)())
         path
             .append('title')
             .text(item => item.title)
@@ -192,7 +267,7 @@ export function MusicGraph(data) {
             .attr('transform', d => `translate(${centroid(d.idx, 1)[0] - 13}, ${centroid(d.idx, 1)[1] - 13})`)
             .transition()
             .duration(250)
-            .attr('transform', d => `translate(${centroid(d.idx, 35)[0] - 10}, ${centroid(d.idx, 35)[1] - 10})`)
+            .attr('transform', item => `translate(${centroid(item.idx, d.radius)[0] - 10}, ${centroid(item.idx, d.radius)[1] - 10})`)
     }
 
     this.nodeDbClick = (d) => {
@@ -203,7 +278,6 @@ export function MusicGraph(data) {
         this.svg.classed('menu-mode', true)
         d.menu = true
 
-        // todo: unfreeze node on dismiss
         d.fx = d.x
         d.fy = d.y
 
@@ -300,7 +374,11 @@ export function MusicGraph(data) {
                 .forEach(target => {
                     target.targetLinks.delete(id)
                 })
-
+            Array.from(this.nodeById.get(id).targetLinks)
+                .map(srcId => this.nodeById.get(srcId))
+                .forEach(target => {
+                    target.sourceLinks.delete(id)
+                })
             this.nodeById.delete(id)
         })
 
@@ -323,7 +401,7 @@ export function MusicGraph(data) {
                 .id(d => d.id)
                 .strength(l => l.weight)
                 .distance(d => Math.min(
-                    (1.2 / d.weight) * (94 * this.expandedNodes.size))
+                    (1.2 / d.weight) * (94 * (this.expandedNodes.size + 1)))
                 )
             )
 
@@ -333,22 +411,24 @@ export function MusicGraph(data) {
         this.link = this.container.select('#links')
             .selectAll('.link')
             .data(this.links)
-        let linkEnter = this.link
+        this.link.exit().remove()
+        this.link = this.link
             .enter()
             .append('line')
             .classed('link', true)
-        this.link = linkEnter.merge(this.link)
+            .merge(this.link)
 
         // Add new nodes
         this.node = this.container.select('#nodes')
             .selectAll('.node')
             .attr('stroke', d => this._getNodeColor(d))
             .data(this.nodes)
-        let nodeEnter = this.node
+        this.node.exit().remove()
+        this.node = this.node
             .enter()
             .append('circle')
             .classed('node', true)
-            .attr('r', 35)
+            .attr('r', d => d.radius)
             .attr('stroke', d => this._getNodeColor(d))
             .call(d3.drag()
                 .on('start', this.dragStarted)
@@ -358,18 +438,19 @@ export function MusicGraph(data) {
             .on('mouseout', this.nodeOut)
             .on('dblclick', this.nodeDbClick)
             .on('contextmenu', this.nodeDbClick)
-        this.node = nodeEnter.merge(this.node)
+            .merge(this.node)
 
         // Add new labels
         this.label = this.container.select('#labels')
             .selectAll('.label')
             .data(this.nodes)
-        let labelEnter = this.label
+        this.label.exit().remove(0)
+        this.label = this.label
             .enter()
             .append('text')
             .text(d => d.name)
             .classed('label', true)
-        this.label = labelEnter.merge(this.label)
+            .merge(this.label)
     }
 
     this.setupKeyBindings = function () {
