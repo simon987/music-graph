@@ -498,8 +498,8 @@ export function MusicGraph(data) {
         return null
     }
 
-    this.addArtistByName = function (name) {
-        this.api.getRelatedByName(name)
+    this.addArtistByMbid = function (mbid) {
+        this.api.getRelatedByMbid(mbid)
             .then(data => {
                 this.addNode(data.node, data.relations)
             })

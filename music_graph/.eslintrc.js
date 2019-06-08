@@ -30,5 +30,6 @@ module.exports = {
         "no-underscore-dangle": 0,
         "no-trailing-spaces": 0,
         "space-before-function-paren": 0,
+        "standard/no-callback-literal": 0,
     }
 };

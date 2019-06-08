@@ -24,13 +24,11 @@ export default {
     },
     methods: {
         onQuery: function (e) {
-            console.log(e)
-            this.mm.addArtistByName(e)
+            this.mm.addArtistByMbid(e)
         }
     },
     mounted() {
         this.mm = new MusicGraph(data)
-        this.mm.addArtistByName('Tool')
     }
 }
 </script>

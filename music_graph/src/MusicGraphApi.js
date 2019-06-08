@@ -63,18 +63,6 @@ export function MusicGraphApi() {
         return d3.json(this.url + '/artist/details/' + mbid)
     }
 
-    this.getRelatedByName = function (name) {
-        return d3.json(this.url + '/artist/related_by_name/' + name.replace(/ /g, '+'))
-            .then((r) => {
-                return {
-                    node: nodeUtils.fromRawDict(r.artists.find(a => a.name === name)),
-                    // TODO: newNodes is always ignored, remove this?
-                    newNodes: r.artists.map(nodeUtils.fromRawDict),
-                    relations: r.relations
-                }
-            })
-    }
-
     this.getGroupMembers = function (mbid, originId) {
         return d3.json(this.url + '/artist/members/' + mbid)
             .then((r) => {
@@ -149,6 +137,7 @@ export function MusicGraphApi() {
         return d3.json(this.url + '/artist/related/' + mbid)
             .then((r) => {
                 return {
+                    node: nodeUtils.fromRawDict(r.artists.find(a => a.mbid === mbid)),
                     newNodes: r.artists.map(nodeUtils.fromRawDict),
                     relations: r.relations
                 }
@@ -171,5 +160,12 @@ export function MusicGraphApi() {
                     })
                 }
             })
+    }
+
+    this.autoComplete = function (prefix) {
+        prefix = prefix.replace(/[^\w.\-!?& ]/g, '_').toUpperCase()
+        prefix = prefix.replace(/ /g, '+')
+
+        return d3.json(this.url + '/artist/autocomplete/' + prefix)
     }
 }
