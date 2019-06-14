@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import {genres} from './genres'
 
 const IGNORE_DATES_TAG = true
-const ONLY_GENRE_TAGS = true
+const ONLY_GENRE_TAGS = false
 
 const nodeUtils = {
     getNodeType: function (labels) {
@@ -138,6 +138,21 @@ export function MusicGraphApi() {
             .then((r) => {
                 return {
                     node: nodeUtils.fromRawDict(r.artists.find(a => a.mbid === mbid)),
+                    newNodes: r.artists.map(nodeUtils.fromRawDict),
+                    relations: r.relations
+                }
+            })
+    }
+
+    this.getRelatedByTag = function(tagid) {
+        return d3.json(this.url + '/tag/related/' + tagid)
+            .then((r) => {
+                return {
+                    node: nodeUtils.fromRawDict({
+                        labels: ['Tag'],
+                        id: r.tag.id,
+                        name: r.tag.name
+                    }),
                     newNodes: r.artists.map(nodeUtils.fromRawDict),
                     relations: r.relations
                 }

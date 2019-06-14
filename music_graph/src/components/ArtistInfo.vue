@@ -18,6 +18,9 @@
                 <el-tag
                     v-for="tag in artistInfo.tags"
                     v-bind:key="tag.id"
+                    v-bind:type="tag.type"
+                    v-on:click="onTagClick(tag.id)"
+                    title="Add tag to graph"
                     size="small"
                 >{{tag.name}}
                 </el-tag>
@@ -29,6 +32,7 @@
 <script>
 import AlbumCarousel from './AlbumCarousel'
 import {MusicGraphApi} from '../MusicGraphApi'
+import {genres} from '../genres'
 
 export default {
     name: 'ArtistInfo',
@@ -36,7 +40,9 @@ export default {
     props: ['artist'],
     watch: {
         artist: function (a) {
-            this.reloadInfo(a)
+            if (a !== undefined) {
+                this.reloadInfo(a)
+            }
         }
     },
     data() {
@@ -54,8 +60,14 @@ export default {
                     this.artistInfo = info
                     this.artistInfo.releases = this.artistInfo.releases.filter(r =>
                         r.labels.indexOf('Album') !== -1 || r.labels.indexOf('EP') !== -1)
-                    this.artistInfo.tags = info.tags.sort((a, b) => b.weight - a.weight).splice(0, 6)
+                    this.artistInfo.tags = info.tags.sort((a, b) => b.weight - a.weight).splice(0, 6).map(t => {
+                        t.type = genres.has(t.name) ? '' : 'info'
+                        return t
+                    })
                 })
+        },
+        onTagClick: function(tag) {
+            this.$emit('addTag', tag)
         }
     }
 }
@@ -84,6 +96,11 @@ export default {
     .el-tag {
         margin-left: 4px;
         margin-bottom: 4px;
+        cursor: pointer;
+    }
+
+    .el-tag:hover {
+        text-decoration: underline;
     }
 
     .year {

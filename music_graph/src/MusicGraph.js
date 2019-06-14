@@ -144,10 +144,6 @@ export function MusicGraph(data) {
             n.node.id === d.id)
 
         this.node.classed('hover', n => n.id === d.id)
-
-        if (d.type === 'Group' || d.type === 'Artist') {
-            this._data.hoverArtist = d
-        }
     }
 
     this.nodeOut = () => {
@@ -294,6 +290,17 @@ export function MusicGraph(data) {
 
         this.makeMenu(d)
         d3.event.preventDefault()
+    }
+
+    this.nodeClick = (d) => {
+        if (d.type === 'Group' || d.type === 'Artist') {
+            // Toggle artistInfo
+            if (this._data.hoverArtist === d) {
+                this._data.hoverArtist = undefined
+            } else {
+                this._data.hoverArtist = d
+            }
+        }
     }
 
     this.addNode = function (newNode, relations) {
@@ -446,8 +453,8 @@ export function MusicGraph(data) {
                 .on('end', this.dragEnded))
             .on('mouseover', this.nodeHover)
             .on('mouseout', this.nodeOut)
-            .on('dblclick', this.nodeDbClick)
             .on('contextmenu', this.nodeDbClick)
+            .on('click', this.nodeClick)
 
         // Add new labels
         this.label = this.container.select('#labels')
@@ -500,6 +507,16 @@ export function MusicGraph(data) {
 
     this.addArtistByMbid = function (mbid) {
         this.api.getRelatedByMbid(mbid)
+            .then(data => {
+                this.addNode(data.node, data.relations)
+            })
+    }
+
+    this.addTagById = function(tagid) {
+        if (this.nodeById.has(tagid)) {
+            return
+        }
+        this.api.getRelatedByTag(tagid)
             .then(data => {
                 this.addNode(data.node, data.relations)
             })

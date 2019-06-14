@@ -2,7 +2,10 @@
     <div>
         <div id="mm"></div>
         <InputBar v-on:query="onQuery($event)"></InputBar>
-        <ArtistInfo v-bind:artist="hoverArtist"/>
+        <ArtistInfo
+            v-bind:artist="hoverArtist"
+            v-on:addTag="onAddTag($event)"
+        />
         <canvas id="textMeasurementCanvas"></canvas>
     </div>
 </template>
@@ -25,6 +28,9 @@ export default {
     methods: {
         onQuery: function (e) {
             this.mm.addArtistByMbid(e)
+        },
+        onAddTag: function(e) {
+            this.mm.addTagById(e)
         }
     },
     mounted() {
