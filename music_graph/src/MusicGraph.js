@@ -364,10 +364,14 @@ export function MusicGraph(data) {
             weight: weight
         }))
 
-        // Update source/targetLinks
+        // Update source/targetLinks, avoid bidirectional links
         for (const {source, target} of linksToAdd) {
-            source.sourceLinks.add(target.id)
-            target.targetLinks.add(source.id)
+            if (!target.sourceLinks.has(source.id)) {
+                source.sourceLinks.add(target.id)
+            }
+            if (!source.targetLinks.has(target.id)) {
+                target.targetLinks.add(source.id)
+            }
         }
 
         this.nodes.push(...nodesToAdd)
@@ -384,20 +388,24 @@ export function MusicGraph(data) {
 
     this.removeNodes = function (idsToRemove) {
         let idSetToRemove = new Set(idsToRemove)
-
+        // Remove child nodes
         idsToRemove.forEach(id => {
-            // Update targetLinks
-            Array.from(this.nodeById.get(id).sourceLinks)
+            this.nodeById.get(id).sourceLinks.forEach(childId => idSetToRemove.add(childId))
+        })
+
+        // Update node link cache
+        idSetToRemove.forEach(id => {
+            let node = this.nodeById.get(id)
+            Array.from(node.sourceLinks)
                 .map(srcId => this.nodeById.get(srcId))
                 .forEach(target => {
                     target.targetLinks.delete(id)
                 })
-            Array.from(this.nodeById.get(id).targetLinks)
+            Array.from(node.targetLinks)
                 .map(srcId => this.nodeById.get(srcId))
                 .forEach(target => {
                     target.sourceLinks.delete(id)
                 })
-            this.nodeById.delete(id)
         })
 
         // Remove links
@@ -407,6 +415,10 @@ export function MusicGraph(data) {
         )
 
         // Remove nodes
+        idSetToRemove.forEach(id => {
+            this.nodeById.delete(id)
+            this.expandedNodes.delete(id)
+        })
         this.nodes = this.nodes.filter(d => !idSetToRemove.has(d.id))
 
         this._update()

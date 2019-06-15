@@ -136,15 +136,29 @@ export function MusicGraphApi() {
     this.getRelatedByMbid = function (mbid) {
         return d3.json(this.url + '/artist/related/' + mbid)
             .then((r) => {
+                let node = nodeUtils.fromRawDict(r.artists.find(a => a.mbid === mbid))
+                let directedRelations = r.relations.map(rel => {
+                    // Make new nodes children of the expanded nodes, no matter the original direction
+                    if (rel.source === node.id) {
+                        return rel
+                    } else {
+                        return {
+                            source: rel.target,
+                            target: rel.source,
+                            weight: rel.weight
+                        }
+                    }
+                })
+
                 return {
-                    node: nodeUtils.fromRawDict(r.artists.find(a => a.mbid === mbid)),
+                    node: node,
                     newNodes: r.artists.map(nodeUtils.fromRawDict),
-                    relations: r.relations
+                    relations: directedRelations
                 }
             })
     }
 
-    this.getRelatedByTag = function(tagid) {
+    this.getRelatedByTag = function (tagid) {
         return d3.json(this.url + '/tag/related/' + tagid)
             .then((r) => {
                 return {
