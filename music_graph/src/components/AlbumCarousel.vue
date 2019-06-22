@@ -7,14 +7,18 @@
             style="float: right"
         >
             <figure>
-                <img
+                <el-image
                     alt=""
                     style="height: 128px"
                     width="128"
                     height="128"
+                    class="block"
                     v-bind:src="api.resolveCoverUrl(release.mbid)"
-                    onerror="this.src='/static/album.png'"
                 >
+                    <div slot="error" class="image-slot">
+                        <i class="el-icon-full-screen"></i>
+                    </div>
+                </el-image>
                 <figcaption>{{release.name}} ({{release.year}})</figcaption>
             </figure>
         </div>
@@ -62,12 +66,25 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 
     figure {
         text-align: center;
+        margin: 0 20px 3em 20px;
+        width: 128px;
+    }
+
+    .el-image {
         width: 128px;
         height: 180px;
-        margin: 0 20px 3em 20px;
+    }
+    .image-slot {
+        font-size: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background: #f5f7fa;
+        color: #909399;
     }
 </style>

@@ -33,12 +33,13 @@ export function MusicGraph(data) {
     this.simulation = d3.forceSimulation()
         .force('charge', d3.forceManyBody())
         .force('collide', d3.forceCollide()
-            .radius(40)
+            .radius(35)
             .strength(1))
         .force('center', d3.forceCenter(width / 2, height / 2))
 
     this.zoomed = () => {
         this.container.attr('transform', d3.event.transform)
+        this.dismiss()
     }
 
     this.dismiss = () => {
@@ -157,7 +158,7 @@ export function MusicGraph(data) {
     this.makeMenu = function (d) {
         let items = []
         let i = 0
-        if (d.type === 'Group' && !d.membersExpanded) {
+        if ((d.type === 'Group' || d.type === 'Artist')) {
             items.push({
                 idx: i++,
                 icon: icons.guitar,
@@ -165,13 +166,12 @@ export function MusicGraph(data) {
                 fn: (d) => {
                     this.api.getGroupMembers(d.mbid, d.id)
                         .then(data => {
-                            d.membersExpanded = true
                             this.addNodes(data.newNodes, data.relations, d.id)
                         })
                 }
             })
         }
-        if ((d.type === 'Group' || d.type === 'Artist') && !d.relatedExpanded) {
+        if ((d.type === 'Group' || d.type === 'Artist')) {
             items.push({
                 idx: i++,
                 icon: icons.expand,
@@ -183,34 +183,43 @@ export function MusicGraph(data) {
                                 this.expandedNodes.add(d.id)
                                 this.addNodes(data.newNodes, data.relations, d.id)
                             }
-                            d.relatedExpanded = true
                         })
                 }
             })
         }
-        if ((d.type === 'Artist' || d.type === 'Group') && !d.releasesExpanded) {
+        if (d.type === 'Tag') {
             items.push({
                 idx: i++,
-                icon: icons.release,
-                title: 'Releases',
+                icon: icons.label,
+                title: 'Related',
                 fn: (d) => {
-                    this.api.getArtistReleases(d.mbid, d.id)
+                    this.api.getRelatedTags(d.id)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
-                            d.releasesExpanded = true
                         })
                 }
             })
         }
-        if ((d.type === 'Album' || d.type === 'EP' || d.type === 'Single' || d.type === 'Group' || d.type === 'Artist') &&
-            !d.tagsExpanded) {
+        if ((d.type === 'Artist' || d.type === 'Group')) {
+            items.push({
+                idx: i++,
+                icon: icons.label,
+                title: 'Label',
+                fn: (d) => {
+                    this.api.getArtistLabels(d.mbid, d.id)
+                        .then(data => {
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                        })
+                }
+            })
+        }
+        if (d.type === 'Album' || d.type === 'EP' || d.type === 'Single' || d.type === 'Group' || d.type === 'Artist') {
             let fn
             if (d.type === 'Group' || d.type === 'Artist') {
                 fn = (d) => {
                     this.api.getArtistTags(d.mbid, d.id)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
-                            d.tagsExpanded = true
                         })
                 }
             } else if (d.type === 'Album' || d.type === 'EP' || d.type === 'Single') {
@@ -218,7 +227,6 @@ export function MusicGraph(data) {
                     this.api.getReleaseDetails(d.mbid, d.id)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
-                            d.tagsExpanded = true
                         })
                 }
             }
@@ -230,12 +238,28 @@ export function MusicGraph(data) {
                 fn: fn
             })
         }
+        if (d.type === 'Tag') {
+            items.push({
+                idx: i++,
+                icon: icons.expand,
+                title: 'Related',
+                fn: (d) => {
+                    this.api.getRelatedByTag(d.id)
+                        .then(data => {
+                            this.addNodes(data.newNodes, data.relations, d.id)
+                        })
+                }
+            })
+        }
         items.push({
             idx: i,
             icon: icons.delete,
             title: 'Remove from graph',
             fn: (d) => {
                 this.removeNodes([d.id])
+                if (this._data.hoverArtist && d.id === this._data.hoverArtist.id) {
+                    this._data.hoverArtist = undefined
+                }
             }
         })
 
@@ -295,17 +319,29 @@ export function MusicGraph(data) {
     this.nodeClick = (d) => {
         if (d.type === 'Group' || d.type === 'Artist') {
             // Toggle artistInfo
+            this.nodes.forEach(x => {
+                x.hover = false
+            })
             if (this._data.hoverArtist === d) {
                 this._data.hoverArtist = undefined
             } else {
                 this._data.hoverArtist = d
+                d.hover = true
             }
+            this._update()
         }
     }
 
     this.addNode = function (newNode, relations) {
         // Convert {id, id} relation to {node, node}
         if (this.nodeById.has(newNode.id)) {
+            // Node already exists, select it
+            this.nodes.forEach(x => {
+                x.hover = false
+            })
+            this._data.hoverArtist = this.nodeById.get(newNode.id)
+            this._data.hoverArtist.hover = true
+            this._update()
             return
         }
         this.nodeById.set(newNode.id, newNode)
@@ -358,11 +394,13 @@ export function MusicGraph(data) {
         })
 
         // Convert {id, id} relation to {node, node}
-        let linksToAdd = relations.map(({weight, source, target}) => ({
-            source: this.nodeById.get(source),
-            target: this.nodeById.get(target),
-            weight: weight
-        }))
+        let linksToAdd = relations
+            .filter(rel => this.nodeById.has(rel.source) && this.nodeById.has(rel.target))
+            .map(({weight, source, target}) => ({
+                source: this.nodeById.get(source),
+                target: this.nodeById.get(target),
+                weight: weight
+            }))
 
         // Update source/targetLinks, avoid bidirectional links
         for (const {source, target} of linksToAdd) {
@@ -430,7 +468,7 @@ export function MusicGraph(data) {
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
                 .strength(l => l.weight)
-                .distance(d => (1.15 / d.weight) * (82 * (this.expandedNodes.size + 1)))
+                .distance(d => (1.12 / d.weight) * 80 * (this.expandedNodes.size + 1))
             )
 
         this.simulation.alphaTarget(0.03).restart()
@@ -456,6 +494,7 @@ export function MusicGraph(data) {
             .enter()
             .append('circle')
             .merge(this.node)
+        this.node
             .classed('node', true)
             .attr('r', d => d.radius)
             .attr('stroke', d => this._getNodeColor(d))
@@ -485,11 +524,13 @@ export function MusicGraph(data) {
 
     this.setupKeyBindings = function () {
         document.body.onkeydown = (e) => {
-            let isPanMode = this.svg.classed('pan-mode')
+            if (e.ctrlKey) {
+                this.svg.classed('pan-mode', true)
+            }
+        }
 
-            if (e.key === 'q') {
-                this.svg.classed('pan-mode', !isPanMode)
-            } else if (e.key === 'Escape') {
+        document.body.onkeyup = (e) => {
+            if (e.key === 'Control') {
                 this.svg.classed('pan-mode', false)
             }
         }
@@ -511,6 +552,9 @@ export function MusicGraph(data) {
     }
 
     this._getNodeColor = function (node) {
+        if (node.hover) {
+            return '#FF0000'
+        }
         if (this.expandedNodes.has(node.id)) {
             return '#1cb3c8'
         }
@@ -524,7 +568,7 @@ export function MusicGraph(data) {
             })
     }
 
-    this.addTagById = function(tagid) {
+    this.addTagById = function (tagid) {
         if (this.nodeById.has(tagid)) {
             return
         }
@@ -546,7 +590,7 @@ export function MusicGraph(data) {
             .attr('cx', d => d.x)
             .attr('cy', d => d.y)
         this.label
-            .attr('x', d => Math.round(d.node.x))
+            .attr('x', d => d.node.x)
             .attr('y', d => d.node.y + d.baseline)
     })
 

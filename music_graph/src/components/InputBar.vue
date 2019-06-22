@@ -9,8 +9,10 @@
             @select="onSubmit"
         >
             <template slot-scope="{ item }">
-                <div class="value" >{{ item.value }} <span class="year"
-                                                           v-if="item.year !== 0">[{{item.year}}]</span></div>
+                <div class="value" v-bind:class="{tag: item.type === 'tag'}">{{ item.value }} <span class="year"
+                                                           v-if="item.year">[{{item.year}}]</span>
+                    <span v-if="item.type === 'tag'" class="year">[tag]</span>
+                </div>
                 <span class="comment" v-if="item.comment">{{ item.comment }}</span>
             </template>
         </el-autocomplete>
@@ -18,7 +20,6 @@
 </template>
 
 <script>
-import * as _ from 'lodash'
 import {MusicGraphApi} from '../MusicGraphApi'
 
 export default {
@@ -29,28 +30,34 @@ export default {
             api: new MusicGraphApi()
         }
     },
-    watch: {
-        query: _.debounce(function () {
-            if (this.query.length >= 3) {
-                this.api.autoComplete(this.query)
-            }
-        }, 500)
-    },
     methods: {
-        onSubmit: function (artist) {
-            this.$emit('query', artist.mbid)
+        onSubmit: function (line) {
+            if (line.type === 'artist') {
+                this.$emit('addArtist', line.mbid)
+            } else if (line.type === 'tag') {
+                this.$emit('addTag', line.id)
+            }
             this.query = ''
         },
         fetchSuggestions: function (query, callback) {
-            if (this.query.length >= 3) {
+            if (this.query.length >= 1) {
                 this.api.autoComplete(query)
                     .then(data => {
-                        callback(data.artists.map(a => {
-                            return {
-                                'value': a.name,
-                                'year': a.year,
-                                'comment': a.comment,
-                                'mbid': a.mbid
+                        callback(data.lines.map(line => {
+                            if (line.type === 'artist') {
+                                return {
+                                    'value': line.name,
+                                    'year': line.year,
+                                    'comment': line.comment,
+                                    'type': line.type,
+                                    'mbid': line.id
+                                }
+                            } else if (line.type === 'tag') {
+                                return {
+                                    'value': line.name,
+                                    'type': line.type,
+                                    'id': line.id
+                                }
                             }
                         }))
                     })
@@ -82,5 +89,9 @@ export default {
         font-size: 85%;
         margin-left: 0.1em;
         vertical-align: top;
+    }
+
+    .tag {
+        color: #409EFF;
     }
 </style>

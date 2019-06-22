@@ -1,17 +1,19 @@
 <template>
     <div>
         <div id="mm"></div>
-        <InputBar v-on:query="onQuery($event)"></InputBar>
+        <InputBar v-on:addArtist="onAddArtist($event)" v-on:addTag="onAddTag($event)"></InputBar>
         <ArtistInfo
             v-bind:artist="hoverArtist"
             v-on:addTag="onAddTag($event)"
         />
         <canvas id="textMeasurementCanvas"></canvas>
+        <Watermark text="music-graph v1.0"/>
     </div>
 </template>
 
 <script>
 import ArtistInfo from './ArtistInfo'
+import Watermark from './Watermark'
 import {MusicGraph} from '../MusicGraph'
 import InputBar from './InputBar'
 
@@ -21,12 +23,12 @@ let data = {
 }
 
 export default {
-    components: {InputBar, ArtistInfo},
+    components: {InputBar, ArtistInfo, Watermark},
     data() {
         return data
     },
     methods: {
-        onQuery: function (e) {
+        onAddArtist: function (e) {
             this.mm.addArtistByMbid(e)
         },
         onAddTag: function(e) {
@@ -35,6 +37,13 @@ export default {
     },
     mounted() {
         this.mm = new MusicGraph(data)
+
+        this.$notify({
+            title: 'Welcome!',
+            message: 'Use the search bar to add nodes. Right click nodes for more options',
+            type: 'info',
+            duration: 15 * 1000
+        })
     }
 }
 </script>
@@ -63,17 +72,12 @@ export default {
         cursor: move;
     }
 
-    svg.pan-mode .pan-rect {
+    .pan-rect {
         pointer-events: all;
     }
 
     svg.menu-mode .dismiss-rect {
         pointer-events: all;
-    }
-
-    svg.pan-mode {
-        box-sizing: border-box;
-        border: 5px red solid;
     }
 
     /* Link */
@@ -123,7 +127,7 @@ export default {
     }
 
     svg .label.tag {
-        fill: darkgrey;
+        fill: #409EFF;
     }
 
     svg.hover .label:not(.selected) {

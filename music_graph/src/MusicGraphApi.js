@@ -63,6 +63,10 @@ export function MusicGraphApi() {
         return d3.json(this.url + '/artist/details/' + mbid)
     }
 
+    /**
+     * Works in both directions
+     * @returns {Promise<{newNodes: *, relations: *} | never>}
+     */
     this.getGroupMembers = function (mbid, originId) {
         return d3.json(this.url + '/artist/members/' + mbid)
             .then((r) => {
@@ -70,8 +74,8 @@ export function MusicGraphApi() {
                     newNodes: r.artists.map(nodeUtils.fromRawDict),
                     relations: r.artists.map(a => {
                         return {
-                            source: a.id,
-                            target: originId,
+                            source: originId,
+                            target: a.id,
                             weight: 0.8
                         }
                     })
@@ -85,6 +89,29 @@ export function MusicGraphApi() {
                 const newNodes = r.releases
                     .map(nodeUtils.fromRawDict)
                     .filter(release => release.type === 'Album')
+
+                return {
+                    newNodes: newNodes,
+                    relations: newNodes.map(t => {
+                        return {
+                            source: originId,
+                            target: t.id,
+                            weight: 0.8
+                        }
+                    })
+                }
+            })
+    }
+
+    this.getArtistLabels = function (mbid, originId) {
+        return d3.json(this.url + '/artist/details/' + mbid)
+            .then((r) => {
+                const newNodes = r.labels
+                    .map(l => {
+                        l.labels = ['Label']
+                        return l
+                    })
+                    .map(nodeUtils.fromRawDict)
 
                 return {
                     newNodes: newNodes,
@@ -133,6 +160,30 @@ export function MusicGraphApi() {
             })
     }
 
+    this.getRelatedTags = function (tagId) {
+        return d3.json(this.url + '/tag/tag/' + tagId)
+            .then((r) => {
+                const tags = this._filterTags(r.tags)
+                let directedRelations = r.relations.map(rel => {
+                    // Make new nodes children of the expanded nodes, no matter the original direction
+                    if (rel.source === tagId) {
+                        return rel
+                    } else {
+                        return {
+                            source: rel.target,
+                            target: rel.source,
+                            weight: rel.weight
+                        }
+                    }
+                })
+
+                return {
+                    newNodes: this._addTagLabel(tags).map(nodeUtils.fromRawDict),
+                    relations: directedRelations
+                }
+            })
+    }
+
     this.getRelatedByMbid = function (mbid) {
         return d3.json(this.url + '/artist/related/' + mbid)
             .then((r) => {
@@ -168,7 +219,14 @@ export function MusicGraphApi() {
                         name: r.tag.name
                     }),
                     newNodes: r.artists.map(nodeUtils.fromRawDict),
-                    relations: r.relations
+                    relations: r.relations.map(rel => {
+                        // Invert relation direction
+                        return {
+                            source: rel.target,
+                            target: rel.source,
+                            weight: rel.weight
+                        }
+                    })
                 }
             })
     }
@@ -195,6 +253,6 @@ export function MusicGraphApi() {
         prefix = prefix.replace(/[^\w.\-!?& ]/g, '_').toUpperCase()
         prefix = prefix.replace(/ /g, '+')
 
-        return d3.json(this.url + '/artist/autocomplete/' + prefix)
+        return d3.json(this.url + '/autocomplete/' + prefix)
     }
 }

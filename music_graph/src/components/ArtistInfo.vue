@@ -58,15 +58,16 @@ export default {
             this.api.getArtistDetails(artist.mbid)
                 .then(info => {
                     this.artistInfo = info
-                    this.artistInfo.releases = this.artistInfo.releases.filter(r =>
-                        r.labels.indexOf('Album') !== -1 || r.labels.indexOf('EP') !== -1)
+                    this.artistInfo.releases = this.artistInfo.releases
+                        .sort((a, b) => a.year - b.year)
+                        .filter(r => r.labels.indexOf('Album') !== -1 || r.labels.indexOf('EP') !== -1)
                     this.artistInfo.tags = info.tags.sort((a, b) => b.weight - a.weight).splice(0, 6).map(t => {
                         t.type = genres.has(t.name) ? '' : 'info'
                         return t
                     })
                 })
         },
-        onTagClick: function(tag) {
+        onTagClick: function (tag) {
             this.$emit('addTag', tag)
         }
     }
