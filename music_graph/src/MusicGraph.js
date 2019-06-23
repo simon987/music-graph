@@ -18,8 +18,23 @@ const arc = function (radius, itemNumber, itemCount, width) {
 }
 
 export function MusicGraph(data) {
-    const width = window.innerWidth - 7
-    const height = window.innerHeight - 7
+    let width = window.innerWidth - 7
+    let height = window.innerHeight - 7
+
+    window.onresize = () => {
+        width = window.innerWidth - 7
+        height = window.innerHeight - 7
+        this.svg
+            .attr('width', width)
+            .attr('height', height)
+        this.panRect
+            .attr('width', width)
+            .attr('height', height)
+        this.dismissRect
+            .attr('width', width)
+            .attr('height', height)
+    }
+
     this._data = data
     this.api = this._data.api
 
@@ -61,14 +76,14 @@ export function MusicGraph(data) {
         .attr('width', width)
         .attr('height', height)
 
-    this.svg.append('rect')
+    this.dismissRect = this.svg.append('rect')
         .attr('width', width)
         .attr('height', height)
         .classed('dismiss-rect', true)
         .style('fill', 'none')
         .on('mousedown', this.dismiss)
 
-    this.svg.append('rect')
+    this.panRect = this.svg.append('rect')
         .attr('width', width)
         .attr('height', height)
         .classed('pan-rect', true)
