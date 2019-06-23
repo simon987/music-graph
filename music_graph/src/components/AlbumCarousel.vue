@@ -26,14 +26,12 @@
 </template>
 
 <script>
-import {MusicGraphApi} from '../MusicGraphApi'
 
 export default {
     name: 'AlbumCarousel',
-    props: ['releases', 'interval', 'alone'],
+    props: ['releases', 'interval', 'alone', 'api'],
     data() {
         return {
-            api: new MusicGraphApi(),
             current: '',
             index: 0
         }

@@ -1,13 +1,19 @@
 <template>
     <div>
         <div id="mm"></div>
-        <InputBar v-on:addArtist="onAddArtist($event)" v-on:addTag="onAddTag($event)"></InputBar>
+        <InputBar
+            v-on:addArtist="onAddArtist($event)"
+            v-on:addTag="onAddTag($event)"
+            :api="api"
+        ></InputBar>
         <ArtistInfo
             v-bind:artist="hoverArtist"
             v-on:addTag="onAddTag($event)"
+            :api="api"
         />
         <canvas id="textMeasurementCanvas"></canvas>
         <Watermark text="music-graph v1.0"/>
+        <LoadingIndicator :loading="loading"/>
     </div>
 </template>
 
@@ -16,14 +22,18 @@ import ArtistInfo from './ArtistInfo'
 import Watermark from './Watermark'
 import {MusicGraph} from '../MusicGraph'
 import InputBar from './InputBar'
+import LoadingIndicator from './LoadingIndicator'
+import {MusicGraphApi} from '../MusicGraphApi'
 
 let data = {
     hoverArtist: undefined,
-    mm: undefined
+    mm: undefined,
+    api: undefined,
+    loading: undefined
 }
 
 export default {
-    components: {InputBar, ArtistInfo, Watermark},
+    components: {LoadingIndicator, InputBar, ArtistInfo, Watermark},
     data() {
         return data
     },
@@ -36,6 +46,7 @@ export default {
         }
     },
     mounted() {
+        this.api = new MusicGraphApi(data)
         this.mm = new MusicGraph(data)
 
         this.$notify({

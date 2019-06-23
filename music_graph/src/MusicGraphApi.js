@@ -52,22 +52,33 @@ const nodeUtils = {
     }
 }
 
-export function MusicGraphApi() {
+export function MusicGraphApi(data) {
     this.url = window.location.protocol + '//' + window.location.hostname + '/api'
+    this._data = data
+
+    let loadWrapper = (fn) => {
+        return (...args) => {
+            this._data.loading = true
+            return fn(...args).then(x => {
+                this._data.loading = false
+                return x
+            })
+        }
+    }
 
     this.resolveCoverUrl = function (mbid) {
         return this.url + '/cover/' + mbid
     }
 
-    this.getArtistDetails = function (mbid) {
+    this.getArtistDetails = loadWrapper((mbid) => {
         return d3.json(this.url + '/artist/details/' + mbid)
-    }
+    })
 
     /**
      * Works in both directions
      * @returns {Promise<{newNodes: *, relations: *} | never>}
      */
-    this.getGroupMembers = function (mbid, originId) {
+    this.getGroupMembers = loadWrapper((mbid, originId) => {
         return d3.json(this.url + '/artist/members/' + mbid)
             .then((r) => {
                 return {
@@ -81,29 +92,9 @@ export function MusicGraphApi() {
                     })
                 }
             })
-    }
+    })
 
-    this.getArtistReleases = function (mbid, originId) {
-        return d3.json(this.url + '/artist/details/' + mbid)
-            .then((r) => {
-                const newNodes = r.releases
-                    .map(nodeUtils.fromRawDict)
-                    .filter(release => release.type === 'Album')
-
-                return {
-                    newNodes: newNodes,
-                    relations: newNodes.map(t => {
-                        return {
-                            source: originId,
-                            target: t.id,
-                            weight: 0.8
-                        }
-                    })
-                }
-            })
-    }
-
-    this.getArtistLabels = function (mbid, originId) {
+    this.getArtistLabels = loadWrapper((mbid, originId) => {
         return d3.json(this.url + '/artist/details/' + mbid)
             .then((r) => {
                 const newNodes = r.labels
@@ -124,25 +115,25 @@ export function MusicGraphApi() {
                     })
                 }
             })
-    }
+    })
 
-    this._filterTags = function (tags) {
+    this._filterTags = loadWrapper((tags) => {
         if (ONLY_GENRE_TAGS) {
             return tags.filter(tag => genres.has(tag.name))
         } else if (IGNORE_DATES_TAG) {
             return tags.filter(tag => isNaN(tag.name) && isNaN(tag.name.slice(0, -1)))
         }
         return tags
-    }
+    })
 
-    this._addTagLabel = function (objects) {
+    this._addTagLabel = loadWrapper((objects) => {
         return objects.map(tag => {
             tag.labels = ['Tag']
             return tag
         })
-    }
+    })
 
-    this.getArtistTags = function (mbid, originId) {
+    this.getArtistTags = loadWrapper((mbid, originId) => {
         return d3.json(this.url + '/artist/details/' + mbid)
             .then((r) => {
                 const tags = this._filterTags(r.tags)
@@ -158,9 +149,9 @@ export function MusicGraphApi() {
                     })
                 }
             })
-    }
+    })
 
-    this.getRelatedTags = function (tagId) {
+    this.getRelatedTags = loadWrapper((tagId) => {
         return d3.json(this.url + '/tag/tag/' + tagId)
             .then((r) => {
                 const tags = this._filterTags(r.tags)
@@ -182,9 +173,9 @@ export function MusicGraphApi() {
                     relations: directedRelations
                 }
             })
-    }
+    })
 
-    this.getRelatedByMbid = function (mbid) {
+    this.getRelatedByMbid = loadWrapper((mbid) => {
         return d3.json(this.url + '/artist/related/' + mbid)
             .then((r) => {
                 let node = nodeUtils.fromRawDict(r.artists.find(a => a.mbid === mbid))
@@ -207,9 +198,9 @@ export function MusicGraphApi() {
                     relations: directedRelations
                 }
             })
-    }
+    })
 
-    this.getRelatedByTag = function (tagid) {
+    this.getRelatedByTag = loadWrapper((tagid) => {
         return d3.json(this.url + '/tag/related/' + tagid)
             .then((r) => {
                 return {
@@ -229,9 +220,9 @@ export function MusicGraphApi() {
                     })
                 }
             })
-    }
+    })
 
-    this.getReleaseDetails = function (mbid, originId) {
+    this.getReleaseDetails = loadWrapper((mbid, originId) => {
         return d3.json(this.url + '/release/details/' + mbid)
             .then((r) => {
                 const tags = this._filterTags(r.tags)
@@ -247,12 +238,13 @@ export function MusicGraphApi() {
                     })
                 }
             })
-    }
+    })
 
-    this.autoComplete = function (prefix) {
-        prefix = prefix.replace(/[^\w.\-!?& ]/g, '_').toUpperCase()
-        prefix = prefix.replace(/ /g, '+')
+    this.autoComplete = loadWrapper((prefix) => {
+        prefix = prefix
+            .replace(/[^\w.\-!?& ]/g, '_').toUpperCase()
+            .replace(/ /g, '+')
 
         return d3.json(this.url + '/autocomplete/' + prefix)
-    }
+    })
 }

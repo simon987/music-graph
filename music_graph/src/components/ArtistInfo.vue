@@ -7,6 +7,7 @@
             <AlbumCarousel
                 style="float: right"
                 :releases="artistInfo.releases"
+                :api="api"
                 interval="1250"/>
             <div>
                 <p v-if="artistInfo.comment!==null"
@@ -31,13 +32,12 @@
 
 <script>
 import AlbumCarousel from './AlbumCarousel'
-import {MusicGraphApi} from '../MusicGraphApi'
 import {genres} from '../genres'
 
 export default {
     name: 'ArtistInfo',
     components: {AlbumCarousel},
-    props: ['artist'],
+    props: ['artist', 'api'],
     watch: {
         artist: function (a) {
             if (a !== undefined) {
@@ -49,8 +49,7 @@ export default {
         return {
             artistInfo: {
                 releases: []
-            },
-            api: new MusicGraphApi()
+            }
         }
     },
     methods: {

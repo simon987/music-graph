@@ -20,16 +20,15 @@
 </template>
 
 <script>
-import {MusicGraphApi} from '../MusicGraphApi'
 
 export default {
     name: 'InputBar',
     data: () => {
         return {
-            query: '',
-            api: new MusicGraphApi()
+            query: ''
         }
     },
+    props: ['api'],
     methods: {
         onSubmit: function (line) {
             if (line.type === 'artist') {

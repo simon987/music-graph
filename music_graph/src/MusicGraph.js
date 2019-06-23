@@ -1,6 +1,5 @@
 import * as d3 from 'd3'
 import icons from './icons'
-import {MusicGraphApi} from './MusicGraphApi'
 import {fitCaptionIntoCircle} from './graphGeometry'
 
 // TODO: export somewhere else
@@ -22,13 +21,13 @@ export function MusicGraph(data) {
     const width = window.innerWidth - 7
     const height = window.innerHeight - 7
     this._data = data
+    this.api = this._data.api
 
     this.nodeById = new Map()
     this.expandedNodes = new Set()
     this.nodes = []
     this.links = []
     this._originSet = false
-    this.api = new MusicGraphApi()
 
     this.simulation = d3.forceSimulation()
         .force('charge', d3.forceManyBody())
@@ -43,7 +42,9 @@ export function MusicGraph(data) {
     }
 
     this.dismiss = () => {
-        this.menu.remove()
+        if (this.menu) {
+            this.menu.remove()
+        }
         const menuNode = this.nodes.find(d => d.menu)
         if (menuNode !== undefined) {
             menuNode.menu = null
