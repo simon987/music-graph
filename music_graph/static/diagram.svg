@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by diasvg.py -->
+<svg width="1200px" viewBox="15.985 4.203 65.529 31.850"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="32.633" y="14.650" width="8.299" height="1.900" fill="#BA478F" stroke="none" stroke-width="0"/>
+<rect x="32.633" y="14.650" width="8.299" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="36.782" y="15.795"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MusicBrainz Artist</text>
+<rect x="45.817" y="20.733" width="9.649" height="2.009" fill="#BA478F" stroke="none" stroke-width="0"/>
+<rect x="45.817" y="20.733" width="9.649" height="2.009" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="50.642" y="21.933"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MusicBrainz Release</text>
+<line x1="39.036" y1="16.598" x2="47.923" y2="20.534" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="48.266,20.686 47.707,20.712 47.923,20.534 47.910,20.254 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="48.266,20.686 47.707,20.712 47.923,20.534 47.910,20.254 "/>
+<rect x="21.400" y="22.450" width="6.448" height="1.900" fill="#BA0000" stroke="none" stroke-width="0"/>
+<rect x="21.400" y="22.450" width="6.448" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<text x="24.624" y="23.595"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Last.fm Artist</text>
+<line x1="35.223" y1="16.600" x2="26.592" y2="22.137" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="26.277,22.339 26.563,21.859 26.592,22.137 26.833,22.280 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="26.277,22.339 26.563,21.859 26.592,22.137 26.833,22.280 "/>
+<rect x="19.079" y="9.919" width="6.372" height="1.900" fill="#17D860" stroke="none" stroke-width="0"/>
+<rect x="19.079" y="9.919" width="6.372" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<text x="22.265" y="11.064"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Spotify Artist</text>
+<line x1="33.717" y1="14.601" x2="25.794" y2="12.019" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="25.437,11.902 25.990,11.820 25.794,12.019 25.835,12.295 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="25.437,11.902 25.990,11.820 25.794,12.019 25.835,12.295 "/>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d ="M 23.012,24.350 A 1.617,1.617 0 0,0 26.205,24.820 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="26.245,24.461 26.535,24.939 26.275,24.835 26.037,24.980 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="26.245,24.461 26.535,24.939 26.275,24.835 26.037,24.980 "/>
+<rect x="51.752" y="12.365" width="8.568" height="1.900" fill="#BA478F" stroke="none" stroke-width="0"/>
+<rect x="51.752" y="12.365" width="8.568" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="56.036" y="13.510"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MusicBrainz Label</text>
+<line x1="51.317" y1="20.684" x2="55.133" y2="14.725" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="55.336,14.409 55.277,14.965 55.133,14.725 54.855,14.696 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="55.336,14.409 55.277,14.965 55.133,14.725 54.855,14.696 "/>
+<rect x="34.960" y="27.722" width="6.847" height="1.958" fill="#BA478F" stroke="none" stroke-width="0"/>
+<rect x="34.960" y="27.722" width="6.847" height="1.958" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="38.383" y="28.896"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MusicBrainz Tag</text>
+<line x1="48.785" y1="22.792" x2="40.618" y2="27.431" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="40.292,27.617 40.603,27.152 40.618,27.431 40.850,27.587 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="40.292,27.617 40.603,27.152 40.618,27.431 40.850,27.587 "/>
+<line x1="36.905" y1="16.600" x2="38.199" y2="27.189" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="38.244,27.561 37.935,27.095 38.199,27.189 38.432,27.034 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="38.244,27.561 37.935,27.095 38.199,27.189 38.432,27.034 "/>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d ="M 36.672,29.680 A 1.751,1.751 0 1,0 40.131,30.152 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="40.119,29.789 40.468,30.225 40.198,30.155 39.980,30.330 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="40.119,29.789 40.468,30.225 40.198,30.155 39.980,30.330 "/>
+<rect x="33.524" y="30.851" width="5.030" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="33.524" y="31.445"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_RELATED_TO</text>
+<rect x="35.916" y="21.548" width="3.572" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="35.916" y="22.143"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_TAGGED</text>
+<rect x="40.163" y="18.395" width="5.822" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="40.163" y="18.990"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_CREDITED_FOR</text>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d ="M 38.857,14.650 A 2.129,2.129 0 0,0 34.653,14.176 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="34.682,14.541 34.326,14.110 34.598,14.176 34.814,13.998 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="34.682,14.541 34.326,14.110 34.598,14.176 34.814,13.998 "/>
+<rect x="34.066" y="7.442" width="5.915" height="5.548" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="34.066" y="8.037"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_MEMBER_OF</text>
+<text x="34.066" y="8.837"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+TEACHER_OF</text>
+<text x="34.066" y="9.637"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_MEMBER_OF</text>
+<text x="34.066" y="10.437"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_TRIBUTE_TO</text>
+<text x="34.066" y="11.237"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+ IS_SUBGROUP_OF</text>
+<text x="34.066" y="12.037"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+ ...</text>
+<text x="34.066" y="12.837"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_NAMED_AFTER</text>
+<rect x="42.475" y="24.765" width="3.572" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="42.475" y="25.360"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_TAGGED</text>
+<rect x="49.413" y="17.785" width="5.965" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="49.413" y="18.380"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+RELEASED_UNDER</text>
+<rect x="20.402" y="24.975" width="5.030" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="20.402" y="25.570"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_RELATED_TO</text>
+<rect x="28.979" y="18.752" width="5.090" height="1.547" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="28.979" y="19.347"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Match based on</text>
+<text x="28.979" y="20.147"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MBID &amp; name</text>
+<rect x="27.591" y="13.034" width="5.090" height="1.547" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="27.591" y="13.629"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Match based on</text>
+<text x="27.591" y="14.429"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+???</text>
+<rect x="44.754" y="6.861" width="7.687" height="1.900" fill="#BA478F" stroke="none" stroke-width="0"/>
+<rect x="44.754" y="6.861" width="7.687" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="48.597" y="8.006"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MusicBrainz Area</text>
+<line x1="40.932" y1="14.650" x2="48.211" y2="9.058" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="48.508,8.830 48.264,9.332 48.211,9.058 47.959,8.936 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="48.508,8.830 48.264,9.332 48.211,9.058 47.959,8.936 "/>
+<rect x="42.223" y="11.352" width="4.090" height="0.748" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="42.223" y="11.947"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_BASED_IN</text>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d ="M 50.519,6.861 A 2.012,2.012 0 0,0 46.589,6.393 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="46.642,6.755 46.255,6.351 46.531,6.396 46.733,6.203 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="46.642,6.755 46.255,6.351 46.531,6.396 46.733,6.203 "/>
+<rect x="48.277" y="4.541" width="3.682" height="0.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="48.277" y="5.136"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_PART_OF</text>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d ="M 23.858,9.919 A 1.614,1.614 0 0,0 20.664,9.447 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="20.654,9.808 20.326,9.355 20.593,9.438 20.819,9.274 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="20.654,9.808 20.326,9.355 20.593,9.438 20.819,9.274 "/>
+<rect x="22.210" y="8.159" width="5.030" height="0.748" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="22.210" y="8.754"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+IS_RELATED_TO</text>
+<rect x="16.035" y="13.757" width="6.648" height="1.900" fill="#17D860" stroke="none" stroke-width="0"/>
+<rect x="16.035" y="13.757" width="6.648" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<text x="19.359" y="14.902"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Spotify Album</text>
+<line x1="21.509" y1="11.868" x2="20.409" y2="13.320" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="20.183,13.619 20.286,13.069 20.409,13.320 20.684,13.371 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="20.183,13.619 20.286,13.069 20.409,13.320 20.684,13.371 "/>
+<rect x="18.686" y="17.310" width="5.798" height="1.900" fill="#17D860" stroke="none" stroke-width="0"/>
+<rect x="18.686" y="17.310" width="5.798" height="1.900" fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<text x="21.585" y="18.455"  fill="#000000" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Spotify Track</text>
+<line x1="19.986" y1="15.707" x2="20.700" y2="16.847" stroke="#000000" stroke-width="0.100" />
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="20.899,17.165 20.422,16.874 20.700,16.847 20.846,16.608 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="20.899,17.165 20.422,16.874 20.700,16.847 20.846,16.608 "/>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d ="M 58.178,12.365 A 2.184,2.184 0 0,0 53.853,11.889 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="53.873,12.256 53.530,11.814 53.800,11.888 54.021,11.717 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="53.873,12.256 53.530,11.814 53.800,11.888 54.021,11.717 "/>
+<rect x="54.794" y="5.823" width="10.735" height="4.747" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<text x="54.794" y="6.418"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+WAS_RENAMED_TO</text>
+<text x="54.794" y="7.218"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+DOES_IMPRINT_FOR</text>
+<text x="54.794" y="8.018"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+DOES_DISTRIBUTION_FOR</text>
+<text x="54.794" y="8.818"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+HAS_BUSINESS_ASSOCIATION_TO</text>
+<text x="54.794" y="9.618"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+OWNS</text>
+<text x="54.794" y="10.418"  fill="#000000" text-anchor="start" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+DOES_REISSUING_FOR</text>
+<path stroke="none" fill="#333333" stroke-width="0.100" d="M 52.578,25.966 C 54.091,25.150 54.847,24.877 56.360,24.877 C 57.873,24.877 58.630,25.150 60.143,25.966 L 60.143,30.321 C 58.630,31.137 57.873,31.409 56.360,31.409 C 54.847,31.409 54.091,31.137 52.578,30.321 L 52.578,25.966 "/>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d="M 52.578,25.966 C 54.091,25.150 54.847,24.877 56.360,24.877 C 57.873,24.877 58.630,25.150 60.143,25.966 L 60.143,30.321 C 58.630,31.137 57.873,31.409 56.360,31.409 C 54.847,31.409 54.091,31.137 52.578,30.321 L 52.578,25.966 "/>
+<path stroke="#000000" fill="none" stroke-width="0.100"  d="M 52.578,25.966 C 54.091,26.782 54.847,27.055 56.360,27.055 C 57.873,27.055 58.630,26.782 60.143,25.966 "/>
+<text x="56.360" y="28.088"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+Cover Art Archive</text>
+<text x="56.360" y="29.688"  fill="#FFFFFF" text-anchor="middle" font-size="0.80" font-family="sans" font-style="normal" font-weight="400">
+MBID:cover</text>
+<line x1="51.583" y1="22.792" x2="53.672" y2="25.133" stroke="#000000" stroke-width="0.100" stroke-dasharray="1.00,1.00"/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="53.227,25.010 53.747,25.216 53.600,24.677 "/>
+<polygon fill="#FFF176" stroke="none" stroke-width="0.100" points="59.226,29.552 61.836,29.552 62.436,30.152 62.436,31.252 59.226,31.252 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="59.226,29.552 61.836,29.552 62.436,30.152 62.436,31.252 59.226,31.252 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.050"  points="61.836,29.552 61.836,30.152 62.436,30.152 "/>
+<text x="59.576" y="30.797"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+~800GB</text>
+<polygon fill="#FFF176" stroke="none" stroke-width="0.100" points="41.848,14.178 43.688,14.178 44.288,14.778 44.288,15.878 41.848,15.878 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="41.848,14.178 43.688,14.178 44.288,14.778 44.288,15.878 41.848,15.878 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.050"  points="43.688,14.178 43.688,14.778 44.288,14.778 "/>
+<text x="42.198" y="15.423"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+~3GB</text>
+<polygon fill="#FFF176" stroke="none" stroke-width="0.100" points="23.233,14.041 25.458,14.041 26.058,14.641 26.058,15.741 23.233,15.741 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="23.233,14.041 25.458,14.041 26.058,14.641 26.058,15.741 23.233,15.741 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.050"  points="25.458,14.041 25.458,14.641 26.058,14.641 "/>
+<text x="23.583" y="15.286"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+~60GB</text>
+<polygon fill="#FFF176" stroke="none" stroke-width="0.100" points="28.689,21.835 30.529,21.835 31.129,22.435 31.129,23.535 28.689,23.535 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="28.689,21.835 30.529,21.835 31.129,22.435 31.129,23.535 28.689,23.535 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.050"  points="30.529,21.835 30.529,22.435 31.129,22.435 "/>
+<text x="29.039" y="23.080"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+~2GB</text>
+</svg>

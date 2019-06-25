@@ -22,4 +22,8 @@ export default {
         color: rgba(0,0,0,0.67);
         font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
     }
+
+    object {
+        font-size: 90%;
+    }
 </style>

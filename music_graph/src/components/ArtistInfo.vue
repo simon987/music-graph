@@ -1,33 +1,36 @@
 <template>
-    <el-card class="artist-info box-card" v-if="artist !== undefined">
-        <div slot="header">
-            <span>{{artist.name}}<span class="year" v-if="artistInfo.year!==0">[{{artistInfo.year}}]</span></span>
-        </div>
-        <div>
-            <AlbumCarousel
-                style="float: right"
-                :releases="artistInfo.releases"
-                :api="api"
-                interval="1250"/>
+    <div>
+        <el-card class="artist-info box-card" v-if="artist !== undefined">
+            <div slot="header">
+                <span>{{artist.name}}<span class="year" v-if="artistInfo.year!==0">[{{artistInfo.year}}]</span></span>
+            </div>
             <div>
-                <p v-if="artistInfo.comment!==null"
-                   class="comment"
-                >{{artistInfo.comment}}</p>
+                <AlbumCarousel
+                    style="float: right"
+                    :releases="artistInfo.releases"
+                    :api="api"
+                    interval="1250"/>
+                <div>
+                    <p v-if="artistInfo.comment!==null"
+                       class="comment"
+                    >{{artistInfo.comment}}</p>
+                </div>
+                <div class="tag-group" v-if="artistInfo.tags && artistInfo.tags.length > 0">
+                    <span class="tag-group__title">Tags</span>
+                    <el-tag
+                        v-for="tag in artistInfo.tags"
+                        v-bind:key="tag.id"
+                        v-bind:type="tag.type"
+                        v-on:click="onTagClick(tag.id)"
+                        title="Add tag to graph"
+                        size="small"
+                    >{{tag.name}}
+                    </el-tag>
+                </div>
             </div>
-            <div class="tag-group" v-if="artistInfo.tags && artistInfo.tags.length > 0">
-                <span class="tag-group__title">Tags</span>
-                <el-tag
-                    v-for="tag in artistInfo.tags"
-                    v-bind:key="tag.id"
-                    v-bind:type="tag.type"
-                    v-on:click="onTagClick(tag.id)"
-                    title="Add tag to graph"
-                    size="small"
-                >{{tag.name}}
-                </el-tag>
-            </div>
-        </div>
-    </el-card>
+        </el-card>
+        <span id="playing" v-if="playingSong">♪ Playing "{{playingSong}} - {{playingRelease}}" ♪</span>
+    </div>
 </template>
 
 <script>
@@ -40,6 +43,7 @@ export default {
     props: ['artist', 'api'],
     watch: {
         artist: function (a) {
+            this.onSongEnd()
             if (a !== undefined) {
                 this.reloadInfo(a)
             }
@@ -48,8 +52,11 @@ export default {
     data() {
         return {
             artistInfo: {
-                releases: []
-            }
+                releases: [],
+                audio: undefined
+            },
+            playingSong: undefined,
+            playingRelease: undefined
         }
     },
     methods: {
@@ -64,10 +71,27 @@ export default {
                         t.type = genres.has(t.name) ? '' : 'info'
                         return t
                     })
+
+                    if (this.artistInfo.spotifyPreviewUrls.length > 0) {
+                        const randSong = this.artistInfo.spotifyPreviewUrls[Math.floor(Math.random() * this.artistInfo.spotifyPreviewUrls.length)]
+                        this.audio = new Audio(randSong.url)
+                        this.playingSong = randSong.name
+                        this.playingRelease = randSong.release
+                        this.audio.play()
+                        this.audio.addEventListener('ended', this.onSongEnd)
+                    }
                 })
         },
         onTagClick: function (tag) {
             this.$emit('addTag', tag)
+        },
+        onSongEnd: function() {
+            if (this.audio !== undefined) {
+                this.audio.pause()
+                this.audio.remove()
+            }
+            this.playingSong = undefined
+            this.playingRelease = undefined
         }
     }
 }
@@ -78,7 +102,7 @@ export default {
         margin: 0 1em;
         position: fixed;
         background: rgba(255, 255, 255, 0.92);
-        font-family: "Bitstream Vera Sans";
+        font-family: "Bitstream Vera Sans",serif;
     }
 
     .comment {
@@ -108,5 +132,14 @@ export default {
         color: #828c94;
         font-size: 85%;
         vertical-align: top;
+    }
+
+    #playing {
+        position: fixed;
+        top: calc(100% - 30px);
+        left: calc(1% + 12em);
+        pointer-events: none;
+        color: rgba(255, 23, 68, 0.69);
+        font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
     }
 </style>
