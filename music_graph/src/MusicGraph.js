@@ -40,6 +40,7 @@ export function MusicGraph(data) {
 
     this.nodeById = new Map()
     this.expandedNodes = new Set()
+    this.graphSize = 0
     this.nodes = []
     this.links = []
     this._originSet = false
@@ -197,6 +198,7 @@ export function MusicGraph(data) {
                         .then(data => {
                             if (data.newNodes.length > 0) {
                                 this.expandedNodes.add(d.id)
+                                this.graphSize++
                                 this.addNodes(data.newNodes, data.relations, d.id)
                             }
                         })
@@ -428,6 +430,13 @@ export function MusicGraph(data) {
             }
         }
 
+        if (nodesToAdd.length > 100) {
+            // That's a lot of nodes, increase spacing
+            this.graphSize++
+        }
+        if (nodesToAdd.length > 200) {
+            this.graphSize++
+        }
         this.nodes.push(...nodesToAdd)
         this.links.push(...linksToAdd)
 
@@ -471,7 +480,10 @@ export function MusicGraph(data) {
         // Remove nodes
         idSetToRemove.forEach(id => {
             this.nodeById.delete(id)
-            this.expandedNodes.delete(id)
+            if (this.expandedNodes.has(id)) {
+                this.expandedNodes.delete(id)
+                this.graphSize--
+            }
         })
         this.nodes = this.nodes.filter(d => !idSetToRemove.has(d.id))
 
@@ -484,7 +496,7 @@ export function MusicGraph(data) {
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
                 .strength(l => l.weight)
-                .distance(d => (1.12 / d.weight) * 80 * (this.expandedNodes.size + 1))
+                .distance(d => (1.12 / d.weight) * 80 * (this.graphSize))
             )
 
         this.simulation.alphaTarget(0.03).restart()
@@ -550,6 +562,10 @@ export function MusicGraph(data) {
                 this.svg.classed('pan-mode', false)
             }
         }
+
+        document.body.onmouseleave = () => {
+            this.svg.classed('pan-mode', false)
+        }
     }
 
     this._setOrigin = function () {
@@ -565,6 +581,7 @@ export function MusicGraph(data) {
 
         // Remember that we expanded origin node
         this.expandedNodes.add(this.originNode.id)
+        this.graphSize++
     }
 
     this._getNodeColor = function (node) {

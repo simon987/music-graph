@@ -99,7 +99,6 @@ export default {
     svg .link {
         stroke: #FFE082;
         pointer-events: none;
-        stroke-opacity: 0.3;
         stroke-width: 1;
     }
 

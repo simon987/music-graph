@@ -10,7 +10,7 @@
         >
             <template slot-scope="{ item }">
                 <div class="value" v-bind:class="{tag: item.type === 'tag'}">{{ item.value }} <span class="year"
-                                                           v-if="item.year">[{{item.year}}]</span>
+                                                                                                    v-if="item.year">[{{item.year}}]</span>
                     <span v-if="item.type === 'tag'" class="year">[tag]</span>
                 </div>
                 <span class="comment" v-if="item.comment">{{ item.comment }}</span>
@@ -77,12 +77,20 @@ export default {
     .inline-input {
         width: 50%;
     }
+
+    @media only screen and (max-width: 600px) {
+        .inline-input {
+            width: 80%;
+        }
+    }
+
     .comment {
         color: #919ba3;
         margin-top: -0.8em;
         padding-left: 0.3em;
         display: block;
     }
+
     .year {
         color: #828c94;
         font-size: 85%;

@@ -137,7 +137,7 @@ export default {
     #playing {
         position: fixed;
         top: calc(100% - 30px);
-        left: calc(1% + 12em);
+        left: calc(20px + 12em);
         pointer-events: none;
         color: rgba(255, 23, 68, 0.69);
         font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;

@@ -1,7 +1,7 @@
 <template>
     <el-main>
         <span>This is the about page</span>
-        <object data="/static/diagram.svg" type="image/svg+xml"></object>
+        <object data="/static/data.svg" type="image/svg+xml"></object>
     </el-main>
 </template>
 

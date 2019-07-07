@@ -15,7 +15,7 @@ export default {
     #watermark {
         position: fixed;
         top: calc(100% - 30px);
-        left: 1%;
+        left: 20px;
         pointer-events: none;
         color: rgba(0,0,0,0.67);
         font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
