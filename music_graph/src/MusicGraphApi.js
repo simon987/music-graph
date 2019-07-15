@@ -117,21 +117,21 @@ export function MusicGraphApi(data) {
             })
     })
 
-    this._filterTags = loadWrapper((tags) => {
+    this._filterTags = tags => {
         if (ONLY_GENRE_TAGS) {
             return tags.filter(tag => genres.has(tag.name))
         } else if (IGNORE_DATES_TAG) {
             return tags.filter(tag => isNaN(tag.name) && isNaN(tag.name.slice(0, -1)))
         }
         return tags
-    })
+    }
 
-    this._addTagLabel = loadWrapper((objects) => {
+    this._addTagLabel = (objects) => {
         return objects.map(tag => {
             tag.labels = ['Tag']
             return tag
         })
-    })
+    }
 
     this.getArtistTags = loadWrapper((mbid, originId) => {
         return d3.json(this.url + '/artist/details/' + mbid)
