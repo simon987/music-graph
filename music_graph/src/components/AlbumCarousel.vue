@@ -72,10 +72,20 @@ export default {
         width: 128px;
     }
 
+    @media (max-width: 601px) {
+        figcaption {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 90%;
+        }
+
+    }
+
     .el-image {
         width: 128px;
         height: 180px;
     }
+
     .image-slot {
         font-size: 30px;
         display: flex;

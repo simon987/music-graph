@@ -29,7 +29,32 @@
                 </div>
             </div>
         </el-card>
-        <span id="playing" v-if="playingSong">♪ Playing "{{playingSong}} - {{playingRelease}}" ♪</span>
+        <div class="footer">
+            <AlbumCarousel
+                style="float: right"
+                :releases="artistInfo.releases"
+                :api="api"
+                interval="1250"/>
+            <div>
+                <p v-if="artistInfo.comment!==null"
+                   class="comment"
+                >{{artistInfo.comment}}</p>
+            </div>
+            <div class="tag-group" v-if="artistInfo.tags && artistInfo.tags.length > 0">
+                <span class="tag-group__title">Tags</span>
+                <el-tag
+                    v-for="tag in artistInfo.tags"
+                    v-bind:key="tag.id"
+                    v-bind:type="tag.type"
+                    v-on:click="onTagClick(tag.id)"
+                    title="Add tag to graph"
+                    size="small"
+                >{{tag.name}}
+                </el-tag>
+            </div>
+        </div>
+        <span id="playing-large" v-if="playingSong">♪ Playing "{{playingSong}} - {{playingRelease}}" ♪</span>
+        <span id="playing" v-if="playingSong">♪ {{playingSong}} - {{playingRelease}}</span>
     </div>
 </template>
 
@@ -98,23 +123,78 @@ export default {
 </script>
 
 <style scoped>
-    .artist-info {
-        margin: 0 1em;
-        position: fixed;
-        background: rgba(255, 255, 255, 0.92);
-        font-family: "Bitstream Vera Sans",serif;
+
+    @media screen and (min-width: 600px){
+
+        .artist-info {
+            margin: 0 1em;
+            position: fixed;
+            background: rgba(255, 255, 255, 0.92);
+            font-family: "Bitstream Vera Sans",serif;
+        }
+
+        .comment {
+            color: #727c84;
+            margin-bottom: 2em;
+            margin-top: 0;
+            min-width: 300px;
+        }
+
+        .tag-group {
+            max-width: 400px;
+            min-width: 300px;
+        }
+
+        .footer {
+            display: none;
+        }
+
+        #playing-large {
+            top: calc(100% - 30px);
+            left: calc(20px + 12em);
+            position: fixed;
+            pointer-events: none;
+            color: rgba(255, 23, 68, 0.69);
+            font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+        }
+
+        #playing {
+            display: none;
+        }
     }
 
-    .comment {
-        color: #727c84;
-        margin-bottom: 2em;
-        margin-top: 0;
-        min-width: 300px;
-    }
+    @media screen and (max-width: 601px) {
+        .footer {
+            padding: 0.5em;
+            height: 200px;
+            width: 100%;
+            position: fixed;
+            background: white;
+            box-shadow: rgba(0,0,0,0.9) -3px 1px 10px;
+            top: calc(100% - 200px);
+        }
 
-    .tag-group {
-        max-width: 400px;
-        min-width: 300px;
+        #playing-large {
+            display: none;
+        }
+
+        #playing {
+            top: calc(5px);
+            left: 5px;
+            width: calc(100% - 5px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            position: fixed;
+            pointer-events: none;
+            color: rgba(255, 23, 68, 0.69);
+            font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+        }
+
+        .artist-info {
+            display: none;
+        }
     }
 
     .el-tag {
@@ -134,12 +214,4 @@ export default {
         vertical-align: top;
     }
 
-    #playing {
-        position: fixed;
-        top: calc(100% - 30px);
-        left: calc(20px + 12em);
-        pointer-events: none;
-        color: rgba(255, 23, 68, 0.69);
-        font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
-    }
 </style>

@@ -208,7 +208,7 @@ export function MusicGraph(data) {
         if (d.type === 'Tag') {
             items.push({
                 idx: i++,
-                icon: icons.label,
+                icon: icons.expand,
                 title: 'Related',
                 fn: (d) => {
                     this.api.getRelatedTags(d.id)
@@ -218,19 +218,19 @@ export function MusicGraph(data) {
                 }
             })
         }
-        if ((d.type === 'Artist' || d.type === 'Group')) {
-            items.push({
-                idx: i++,
-                icon: icons.label,
-                title: 'Label',
-                fn: (d) => {
-                    this.api.getArtistLabels(d.mbid, d.id)
-                        .then(data => {
-                            this.addNodes(data.newNodes, data.relations, d.id)
-                        })
-                }
-            })
-        }
+        // if ((d.type === 'Artist' || d.type === 'Group')) {
+        //     items.push({
+        //         idx: i++,
+        //         icon: icons.label,
+        //         title: 'Label',
+        //         fn: (d) => {
+        //             this.api.getArtistLabels(d.mbid, d.id)
+        //                 .then(data => {
+        //                     this.addNodes(data.newNodes, data.relations, d.id)
+        //                 })
+        //         }
+        //     })
+        // }
         if (d.type === 'Album' || d.type === 'EP' || d.type === 'Single' || d.type === 'Group' || d.type === 'Artist') {
             let fn
             if (d.type === 'Group' || d.type === 'Artist') {
@@ -275,9 +275,6 @@ export function MusicGraph(data) {
             title: 'Remove from graph',
             fn: (d) => {
                 this.removeNodes([d.id])
-                if (this._data.hoverArtist && d.id === this._data.hoverArtist.id) {
-                    this._data.hoverArtist = undefined
-                }
             }
         })
 
@@ -483,6 +480,9 @@ export function MusicGraph(data) {
             if (this.expandedNodes.has(id)) {
                 this.expandedNodes.delete(id)
                 this.graphSize--
+            }
+            if (this._data.hoverArtist && id === this._data.hoverArtist.id) {
+                this._data.hoverArtist = undefined
             }
         })
         this.nodes = this.nodes.filter(d => !idSetToRemove.has(d.id))

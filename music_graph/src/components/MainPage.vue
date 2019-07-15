@@ -12,7 +12,7 @@
             :api="api"
         />
         <canvas id="textMeasurementCanvas"></canvas>
-        <Watermark text="music-graph v1.0"/>
+        <Watermark text="music-graph v1.1"/>
         <LoadingIndicator :loading="loading"/>
     </div>
 </template>
@@ -51,9 +51,10 @@ export default {
 
         this.$notify({
             title: 'Welcome!',
-            message: 'Use the search bar to add nodes. Right click nodes for more options',
+            message: 'Use the search bar to add nodes. Right click (or long tap) nodes for more options',
             type: 'info',
-            duration: 15 * 1000
+            duration: 45 * 1000,
+            offset: 100
         })
     }
 }
