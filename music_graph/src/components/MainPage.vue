@@ -51,10 +51,12 @@ export default {
 
         this.$notify({
             title: 'Welcome!',
-            message: 'Use the search bar to add nodes. Right click (or long tap) nodes for more options',
+            message: 'Use the search bar to add nodes. Right click (or long tap) nodes for more options.' +
+                '<br><a href="/about">About this project</a>',
             type: 'info',
             duration: 45 * 1000,
-            offset: 100
+            offset: 100,
+            dangerouslyUseHTMLString: true
         })
     }
 }

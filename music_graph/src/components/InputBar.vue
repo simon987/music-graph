@@ -4,7 +4,7 @@
             class="inline-input"
             v-model="query"
             :fetch-suggestions="fetchSuggestions"
-            placeholder="Add nodes"
+            placeholder="Add artists or tags here"
             :trigger-on-focus="false"
             @select="onSubmit"
         >
