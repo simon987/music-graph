@@ -5,6 +5,9 @@
                 <span>{{artist.name}}<span class="year" v-if="artistInfo.year!==0">[{{artistInfo.year}}]</span></span>
             </div>
             <div>
+                <a target="_blank" :href="'https://musicbrainz.org/artist/' + artist.mbid">
+                    <img width="30" height="30" src="../../static/MB.png"/>
+                </a>
                 <AlbumCarousel
                     style="float: right"
                     :releases="artistInfo.releases"
@@ -110,7 +113,7 @@ export default {
         onTagClick: function (tag) {
             this.$emit('addTag', tag)
         },
-        onSongEnd: function() {
+        onSongEnd: function () {
             if (this.audio !== undefined) {
                 this.audio.pause()
                 this.audio.remove()
@@ -124,13 +127,13 @@ export default {
 
 <style scoped>
 
-    @media screen and (min-width: 600px){
+    @media screen and (min-width: 600px) {
 
         .artist-info {
             margin: 0 1em;
             position: fixed;
             background: rgba(255, 255, 255, 0.92);
-            font-family: "Bitstream Vera Sans",serif;
+            font-family: "Bitstream Vera Sans", serif;
         }
 
         .comment {
@@ -170,7 +173,7 @@ export default {
             width: 100%;
             position: fixed;
             background: white;
-            box-shadow: rgba(0,0,0,0.9) -3px 1px 10px;
+            box-shadow: rgba(0, 0, 0, 0.9) -3px 1px 10px;
             top: calc(100% - 200px);
         }
 

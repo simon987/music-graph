@@ -198,7 +198,6 @@ export function MusicGraph(data) {
                         .then(data => {
                             if (data.newNodes.length > 0) {
                                 this.expandedNodes.add(d.id)
-                                this.graphSize++
                                 this.addNodes(data.newNodes, data.relations, d.id)
                             }
                         })
@@ -317,6 +316,7 @@ export function MusicGraph(data) {
     }
 
     this.nodeDbClick = (d) => {
+        this.dismiss()
         if (this.svg.classed('menu-mode')) {
             return
         }
@@ -427,6 +427,9 @@ export function MusicGraph(data) {
             }
         }
 
+        if (nodesToAdd.length > 0) {
+            this.graphSize++
+        }
         if (nodesToAdd.length > 100) {
             // That's a lot of nodes, increase spacing
             this.graphSize++
@@ -496,7 +499,7 @@ export function MusicGraph(data) {
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
                 .strength(l => l.weight)
-                .distance(d => (1.12 / d.weight) * 80 * (this.graphSize))
+                .distance(d => (1.12 / d.weight) * 40 * (this.graphSize))
             )
 
         this.simulation.alphaTarget(0.03).restart()
