@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="mm"></div>
+        <div id="mg"></div>
         <InputBar
             v-on:addArtist="onAddArtist($event)"
             v-on:addTag="onAddTag($event)"

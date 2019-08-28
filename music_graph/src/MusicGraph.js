@@ -72,7 +72,7 @@ export function MusicGraph(data) {
         this.svg.classed('menu-mode', false)
     }
 
-    this.svg = d3.select('#mm')
+    this.svg = d3.select('#mg')
         .append('svg')
         .attr('width', width)
         .attr('height', height)
