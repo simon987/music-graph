@@ -1,4 +1,11 @@
-export const genres = new Set([
+
+export function isGenreTag(name, id) {
+    // Spotify tag ids start at 10000000, we assume that all of them are
+    //  genre tags
+    return genres.has(name) || id > 10000000
+}
+
+const genres = new Set([
     'acid house',
     'acid jazz',
     'acid techno',

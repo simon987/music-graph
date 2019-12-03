@@ -63,7 +63,7 @@
 
 <script>
 import AlbumCarousel from './AlbumCarousel'
-import {genres} from '../genres'
+import {isGenreTag} from '../genres'
 
 export default {
     name: 'ArtistInfo',
@@ -95,8 +95,8 @@ export default {
                     this.artistInfo.releases = this.artistInfo.releases
                         .sort((a, b) => a.year - b.year)
                         .filter(r => r.labels.indexOf('Album') !== -1 || r.labels.indexOf('EP') !== -1)
-                    this.artistInfo.tags = info.tags.sort((a, b) => b.weight - a.weight).splice(0, 6).map(t => {
-                        t.type = genres.has(t.name) ? '' : 'info'
+                    this.artistInfo.tags = info.tags.sort((a, b) => b.weight - a.weight).splice(0, 99).map(t => {
+                        t.type = isGenreTag(t.name, t.tagid) ? '' : 'info'
                         return t
                     })
 

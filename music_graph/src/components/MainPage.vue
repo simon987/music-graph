@@ -5,14 +5,14 @@
             v-on:addArtist="onAddArtist($event)"
             v-on:addTag="onAddTag($event)"
             :api="api"
-        ></InputBar>
+        />
         <ArtistInfo
             v-bind:artist="hoverArtist"
             v-on:addTag="onAddTag($event)"
             :api="api"
         />
-        <canvas id="textMeasurementCanvas"></canvas>
-        <Watermark text="music-graph v1.1"/>
+        <canvas id="textMeasurementCanvas"/>
+        <Watermark text="music-graph v1.2"/>
         <LoadingIndicator :loading="loading"/>
     </div>
 </template>

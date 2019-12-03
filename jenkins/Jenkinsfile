@@ -34,10 +34,10 @@ pipeline {
             steps {
                 node('master') {
                     unstash 'webdist'
-                    sshCommand remote: remote, command: "cd music-graph && rm -rf webroot/* deploy.sh"
-                    sshPut remote: remote, from: 'webroot/', into: 'music-graph'
-                    sshPut remote: remote, from: 'jenkins/deploy.sh', into: 'music-graph/'
-                    sshCommand remote: remote, command: 'chmod +x music-graph/deploy.sh && ./music-graph/deploy.sh'
+                    sshCommand remote: remote, command: "cd /srv/music-graph && rm -rf /srv/webroot/* deploy.sh"
+                    sshPut remote: remote, from: 'webroot/', into: '/srv/music-graph'
+                    sshPut remote: remote, from: 'jenkins/deploy.sh', into: '/srv/music-graph/'
+                    sshCommand remote: remote, command: 'chmod +x /srv/music-graph/deploy.sh && /srv/music-graph/deploy.sh'
                 }
             }
         }

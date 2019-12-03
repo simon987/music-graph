@@ -91,9 +91,12 @@ export function MusicGraph(data) {
         .style('fill', 'none')
         .call(d3.zoom()
             .scaleExtent([1 / 10, 5])
-            .on('zoom', this.zoomed))
+            .on('zoom', this.zoomed)
+        )
+        .on('click', this.dismiss)
 
-    this.container = this.svg.append('g').attr('id', 'container')
+    this.container = this.svg.append('g')
+        .attr('id', 'container')
 
     this.container.append('g').attr('id', 'links')
     this.container.append('g').attr('id', 'nodes')
@@ -175,7 +178,7 @@ export function MusicGraph(data) {
     this.makeMenu = function (d) {
         let items = []
         let i = 0
-        if ((d.type === 'Group' || d.type === 'Artist')) {
+        if (d.type === 'Group' || d.type === 'Artist') {
             items.push({
                 idx: i++,
                 icon: icons.guitar,
@@ -184,6 +187,22 @@ export function MusicGraph(data) {
                     this.api.getGroupMembers(d.mbid, d.id)
                         .then(data => {
                             this.addNodes(data.newNodes, data.relations, d.id)
+                        })
+                }
+            })
+        }
+        if ((d.type === 'Group' || d.type === 'Artist') &&
+            this._data.hoverArtist !== undefined && this._data.hoverArtist.id !== d.id) {
+            items.push({
+                idx: i++,
+                icon: icons.path,
+                title: 'Path to here',
+                fn: (d) => {
+                    this.api.getPath(this._data.hoverArtist.mbid, d.mbid)
+                        .then(data => {
+                            if (data.newNodes.length > 0) {
+                                this.addNodes(data.newNodes, data.relations)
+                            }
                         })
                 }
             })
@@ -332,6 +351,7 @@ export function MusicGraph(data) {
     }
 
     this.nodeClick = (d) => {
+        this.dismiss()
         if (d.type === 'Group' || d.type === 'Artist') {
             // Toggle artistInfo
             this.nodes.forEach(x => {
@@ -347,45 +367,21 @@ export function MusicGraph(data) {
         }
     }
 
-    this.addNode = function (newNode, relations) {
-        // Convert {id, id} relation to {node, node}
-        if (this.nodeById.has(newNode.id)) {
-            // Node already exists, select it
+    this.addNodes = function (newNodes, relations, originId) {
+        // Update node map, ignore existing nodes
+        let nodesToAdd = []
+
+        // If we're adding a single node and it already exists, select it
+        if (newNodes.length === 1 && this.nodeById.has(newNodes[0].id)) {
             this.nodes.forEach(x => {
                 x.hover = false
             })
-            this._data.hoverArtist = this.nodeById.get(newNode.id)
+            this._data.hoverArtist = this.nodeById.get(newNodes[0].id)
             this._data.hoverArtist.hover = true
             this._update()
             return
         }
-        this.nodeById.set(newNode.id, newNode)
-        newNode.x = width / 2
-        newNode.y = height / 2
 
-        let linksToAdd = relations
-            .filter(rel => this.nodeById.has(rel.source) && this.nodeById.has(rel.target))
-            .map(({weight, source, target}) => ({
-                source: this.nodeById.get(source),
-                target: this.nodeById.get(target),
-                weight: weight
-            }))
-
-        // Update source/targetLinks
-        for (const {source, target} of linksToAdd) {
-            source.sourceLinks.add(target.id)
-            target.targetLinks.add(source.id)
-        }
-
-        this.nodes.push(newNode)
-        this.links.push(...linksToAdd)
-
-        this._update()
-    }
-
-    this.addNodes = function (newNodes, relations, originId) {
-        // Update node map, ignore existing nodes
-        let nodesToAdd = []
         newNodes.forEach(d => {
             if (this.nodeById.has(d.id)) {
                 return
@@ -403,6 +399,9 @@ export function MusicGraph(data) {
                     centerNode.fx = null
                     centerNode.fy = null
                 }, 600)
+            } else {
+                d.x = width / 2
+                d.y = height / 2
             }
 
             nodesToAdd.push(d)
@@ -499,7 +498,7 @@ export function MusicGraph(data) {
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
                 .strength(l => l.weight)
-                .distance(d => (1.12 / d.weight) * 40 * (this.graphSize))
+                .distance(d => (1.12 / d.weight) * 30 * (this.graphSize))
             )
 
         this.simulation.alphaTarget(0.03).restart()
@@ -514,6 +513,7 @@ export function MusicGraph(data) {
             .append('line')
             .merge(this.link)
             .classed('link', true)
+            .attr('stroke', d => this._getLinkColor(d))
 
         // Add new nodes
         this.node = this.container.select('#nodes')
@@ -597,10 +597,14 @@ export function MusicGraph(data) {
         return null
     }
 
+    this._getLinkColor = function (node) {
+        return '#FF0000'
+    }
+
     this.addArtistByMbid = function (mbid) {
         this.api.getRelatedByMbid(mbid)
             .then(data => {
-                this.addNode(data.node, data.relations)
+                this.addNodes([data.node], data.relations)
             })
     }
 
@@ -610,7 +614,19 @@ export function MusicGraph(data) {
         }
         this.api.getRelatedByTag(tagid)
             .then(data => {
-                this.addNode(data.node, data.relations)
+                // Force tag->artist direction
+                const relations = data.relations.map(rel => {
+                    if (rel.source === data.node.id) {
+                        return {
+                            weight: rel.weight,
+                            source: rel.target,
+                            target: rel.source
+                        }
+                    } else {
+                        return rel
+                    }
+                })
+                this.addNodes([data.node], relations)
             })
     }
 

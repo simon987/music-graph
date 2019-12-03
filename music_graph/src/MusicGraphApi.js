@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import {genres} from './genres'
+import {isGenreTag} from './genres'
 
 const IGNORE_DATES_TAG = true
 const ONLY_GENRE_TAGS = false
@@ -54,6 +54,7 @@ const nodeUtils = {
 
 export function MusicGraphApi(data) {
     this.url = window.location.protocol + '//' + window.location.hostname + '/api'
+    // this.url = window.location.protocol + '//' + window.location.hostname + ':3030'
     this._data = data
 
     let loadWrapper = (fn) => {
@@ -119,7 +120,7 @@ export function MusicGraphApi(data) {
 
     this._filterTags = tags => {
         if (ONLY_GENRE_TAGS) {
-            return tags.filter(tag => genres.has(tag.name))
+            return tags.filter(tag => isGenreTag(tag.name, tag.tagid))
         } else if (IGNORE_DATES_TAG) {
             return tags.filter(tag => isNaN(tag.name) && isNaN(tag.name.slice(0, -1)))
         }
@@ -215,7 +216,7 @@ export function MusicGraphApi(data) {
                         return {
                             source: rel.target,
                             target: rel.source,
-                            weight: rel.weight
+                            weight: Math.min(Math.max(rel.weight * 1.5, 0.2), 1)
                         }
                     })
                 }
@@ -236,6 +237,16 @@ export function MusicGraphApi(data) {
                             weight: t.weight
                         }
                     })
+                }
+            })
+    })
+
+    this.getPath = loadWrapper((idFrom, idTo) => {
+        return d3.json(this.url + '/artist/path/' + idFrom + '/' + idTo)
+            .then((r) => {
+                return {
+                    newNodes: r.artists.map(nodeUtils.fromRawDict),
+                    relations: r.relations
                 }
             })
     })
