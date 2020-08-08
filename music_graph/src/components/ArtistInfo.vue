@@ -100,8 +100,8 @@ export default {
                         return t
                     })
 
-                    if (this.artistInfo.spotifyPreviewUrls.length > 0) {
-                        const randSong = this.artistInfo.spotifyPreviewUrls[Math.floor(Math.random() * this.artistInfo.spotifyPreviewUrls.length)]
+                    if (this.artistInfo.tracks.length > 0) {
+                        const randSong = this.artistInfo.tracks[Math.floor(Math.random() * this.artistInfo.tracks.length)]
                         this.audio = new Audio(randSong.url)
                         this.playingSong = randSong.name
                         this.playingRelease = randSong.release
