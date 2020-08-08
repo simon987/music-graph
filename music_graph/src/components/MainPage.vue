@@ -12,7 +12,7 @@
             :api="api"
         />
         <canvas id="textMeasurementCanvas"/>
-        <Watermark text="music-graph v1.2"/>
+        <Watermark text="music-graph v2.0"/>
         <LoadingIndicator :loading="loading"/>
     </div>
 </template>
