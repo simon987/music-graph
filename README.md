@@ -1,7 +1,6 @@
 # music-graph-ui
 
 [![CodeFactor](https://www.codefactor.io/repository/github/simon987/music-graph-ui/badge)](https://www.codefactor.io/repository/github/simon987/music-graph-ui)
-[![Build Status](https://ci.simon987.net/buildStatus/icon?job=music_graph)](https://ci.simon987.net/job/music_graph/)
 
 ![demo](demo.png)
 

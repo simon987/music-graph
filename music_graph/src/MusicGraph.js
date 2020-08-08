@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 import icons from './icons'
 import {fitCaptionIntoCircle} from './graphGeometry'
+import config from './graphConfig'
 
 // TODO: export somewhere else
 const arc = function (radius, itemNumber, itemCount, width) {
@@ -40,7 +41,7 @@ export function MusicGraph(data) {
 
     this.nodeById = new Map()
     this.expandedNodes = new Set()
-    this.graphSize = 0
+    this.nodeCount = 0
     this.nodes = []
     this.links = []
     this._originSet = false
@@ -90,7 +91,7 @@ export function MusicGraph(data) {
         .classed('pan-rect', true)
         .style('fill', 'none')
         .call(d3.zoom()
-            .scaleExtent([1 / 10, 5])
+            .scaleExtent(config.scaleExtent)
             .on('zoom', this.zoomed)
         )
         .on('click', this.dismiss)
@@ -108,7 +109,7 @@ export function MusicGraph(data) {
             return
         }
         if (!d3.event.active) {
-            this.simulation.alphaTarget(0.3).restart()
+            this.simulation.alphaTarget(config.initialAlphaTarget).restart()
         }
         d.fx = d.x
         d.fy = d.y
@@ -426,16 +427,8 @@ export function MusicGraph(data) {
             }
         }
 
-        if (nodesToAdd.length > 0) {
-            this.graphSize++
-        }
-        if (nodesToAdd.length > 100) {
-            // That's a lot of nodes, increase spacing
-            this.graphSize++
-        }
-        if (nodesToAdd.length > 200) {
-            this.graphSize++
-        }
+        this.nodeCount += nodesToAdd.length
+
         this.nodes.push(...nodesToAdd)
         this.links.push(...linksToAdd)
 
@@ -481,13 +474,15 @@ export function MusicGraph(data) {
             this.nodeById.delete(id)
             if (this.expandedNodes.has(id)) {
                 this.expandedNodes.delete(id)
-                this.graphSize--
+                this.nodeCount--
             }
             if (this._data.hoverArtist && id === this._data.hoverArtist.id) {
                 this._data.hoverArtist = undefined
             }
         })
         this.nodes = this.nodes.filter(d => !idSetToRemove.has(d.id))
+
+        this.nodeCount -= idSetToRemove.size
 
         this._update()
     }
@@ -497,11 +492,11 @@ export function MusicGraph(data) {
         this.simulation
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
-                .strength(l => l.weight)
-                .distance(d => (1.12 / d.weight) * 30 * (this.graphSize))
+                .strength(d => config.linkStrength(d, this.nodeCount))
+                .distance(d => config.linkDistance(d, this.nodeCount))
             )
 
-        this.simulation.alphaTarget(0.03).restart()
+        this.simulation.alphaTarget(config.restartAlphaTarget).restart()
 
         // Add new links
         this.link = this.container.select('#links')
@@ -584,7 +579,6 @@ export function MusicGraph(data) {
 
         // Remember that we expanded origin node
         this.expandedNodes.add(this.originNode.id)
-        this.graphSize++
     }
 
     this._getNodeColor = function (node) {
