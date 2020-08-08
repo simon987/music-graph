@@ -1,5 +1,5 @@
-let GRAPH_SIZE_FACTOR = 0.3
-let INITIAL_DISTANCE = 50
+let GRAPH_SIZE_FACTOR = 0.4
+let INITIAL_DISTANCE = 80
 
 window.addEventListener('keydown', e => {
     if (e.key === 'ArrowUp') {
