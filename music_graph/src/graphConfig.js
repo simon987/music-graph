@@ -10,7 +10,6 @@ window.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown') {
         INITIAL_DISTANCE -= 10
     }
-    console.log(INITIAL_DISTANCE)
 })
 
 export default {

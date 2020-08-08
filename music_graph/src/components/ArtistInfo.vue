@@ -64,6 +64,7 @@
 <script>
 import AlbumCarousel from './AlbumCarousel'
 import {isGenreTag} from '../genres'
+import _ from 'lodash'
 
 export default {
     name: 'ArtistInfo',
@@ -95,10 +96,10 @@ export default {
                     this.artistInfo.releases = this.artistInfo.releases
                         .sort((a, b) => a.year - b.year)
                         .filter(r => r.labels.indexOf('Album') !== -1 || r.labels.indexOf('EP') !== -1)
-                    this.artistInfo.tags = info.tags.sort((a, b) => b.weight - a.weight).splice(0, 99).map(t => {
+                    this.artistInfo.tags = _.uniqBy(info.tags.sort((a, b) => b.weight - a.weight).splice(0, 99).map(t => {
                         t.type = isGenreTag(t.name, t.tagid) ? '' : 'info'
                         return t
-                    })
+                    }), 'name')
 
                     if (this.artistInfo.tracks.length > 0) {
                         const randSong = this.artistInfo.tracks[Math.floor(Math.random() * this.artistInfo.tracks.length)]
